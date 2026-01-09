@@ -43,13 +43,13 @@
                          Remember this Device
                        </label>
                      </div>
-                    <a class="text-primary fw-bold" href="./index.html">Forgot Password ?</a>
+                    <a class="text-primary fw-bold" href="{{route('password.request')}}">Forgot Password ?</a>
                   </div>
                    <button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-4">Sign In</button>
-                  <!-- <div class="d-flex align-items-center justify-content-center">
+                  <div class="d-flex align-items-center justify-content-center">
                     <p class="fs-4 mb-0 fw-bold">New to AdminKasir?</p>
-                    <a class="text-primary fw-bold ms-2" href="./authentication-register.html">Create an account</a>
-                  </div> -->
+                     <a class="text-primary fw-bold ms-2" href="{{ route('register') }}">Create an account</a>
+                  </div>
                 </form>
               </div>
             </div>
