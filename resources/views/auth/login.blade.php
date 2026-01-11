@@ -23,7 +23,7 @@
                 <a href="" class="text-nowrap logo-img text-center d-block py-3 w-100">
                   <img src="../assets/images/logos/logo.svg" alt="">
                 </a>
-                <p class="text-center">Aplikasi Kasir Anda</p>
+                <p class="text-center">Sign In To Your Account</p>
                  <form action="{{ route('login') }}" method="POST">
                    @csrf
                    <div class="mb-3">
