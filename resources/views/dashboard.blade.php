@@ -107,7 +107,7 @@
        <div>
          <div class="brand-logo d-flex align-items-center justify-content-between px-3 pt-3">
            <a href="./index.html" class="text-nowrap logo-img">
-             <img src="../assets/images/logos/logo.svg" alt="" />
+             <img src="../assets/images/logos/SuperStock.png" alt="" />
            </a>
            <div class="close-btn d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
              <i class="ti ti-x fs-8"></i>

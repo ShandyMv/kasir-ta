@@ -21,7 +21,7 @@
             <div class="card mb-0">
               <div class="card-body">
                 <a href="./index.html" class="text-nowrap logo-img text-center d-block py-3 w-100">
-                  <img src="../assets/images/logos/logo.svg" alt="">
+                  <img src="../assets/images/logos/SuperStock.png" alt="">
                 </a>
                 <p class="text-center">Your Social Campaigns</p>
                 <form>

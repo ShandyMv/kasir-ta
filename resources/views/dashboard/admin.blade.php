@@ -140,37 +140,50 @@
 @push('scripts')
 <script>
   $(document).ready(function() {
-    var options = {
-      chart: { type: 'bar', height: 300, toolbar: { show: false } },
-      series: [{
-        name: 'Stok Saat Ini',
-        data: @json($chartStok)
-      }, {
-        name: 'Stok Minimum',
-        data: @json($chartMin)
-      }],
-      xaxis: {
-        categories: @json($chartCategories),
-        labels: {
-          rotate: -45,
-          style: { fontSize: '10px' }
-        }
-      },
-      colors: ['#5D87FF', '#DC3545'],
-      plotOptions: { bar: { borderRadius: 4, columnWidth: '60%' } },
-      dataLabels: { enabled: false },
-      legend: { position: 'top' }
-    };
-    try {
-      var chart = new ApexCharts(document.querySelector("#stockChart"), options);
-      chart.render().then(function() {
-        document.getElementById('stockChartLoader').style.display = 'none';
-      }).catch(function() {
-        document.getElementById('stockChartLoader').style.display = 'none';
-      });
-    } catch(e) {
-      document.getElementById('stockChartLoader').style.display = 'none';
-    }
+    setTimeout(function() {
+      var loaderEl = document.getElementById('stockChartLoader');
+      var timeout = setTimeout(function() {
+        if (loaderEl) loaderEl.style.display = 'none';
+      }, 5000);
+
+      var options = {
+        chart: { type: 'bar', height: 300, toolbar: { show: false } },
+        series: [{
+          name: 'Stok Saat Ini',
+          data: @json($chartStok)
+        }, {
+          name: 'Stok Minimum',
+          data: @json($chartMin)
+        }],
+        xaxis: {
+          categories: @json($chartCategories),
+          labels: {
+            rotate: -45,
+            style: { fontSize: '10px' }
+          }
+        },
+        colors: ['#5D87FF', '#DC3545'],
+        plotOptions: { bar: { borderRadius: 4, columnWidth: '60%' } },
+        dataLabels: { enabled: false },
+        legend: { position: 'top' }
+      };
+      try {
+        var chart = new ApexCharts(document.querySelector("#stockChart"), options);
+        chart.render().then(function() {
+          clearTimeout(timeout);
+          if (loaderEl) loaderEl.style.display = 'none';
+          setTimeout(function() {
+            window.dispatchEvent(new Event('resize'));
+          }, 100);
+        }).catch(function() {
+          clearTimeout(timeout);
+          if (loaderEl) loaderEl.style.display = 'none';
+        });
+      } catch(e) {
+        clearTimeout(timeout);
+        if (loaderEl) loaderEl.style.display = 'none';
+      }
+    });
   });
 </script>
 @endpush

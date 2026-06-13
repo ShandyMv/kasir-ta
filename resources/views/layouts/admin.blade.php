@@ -252,7 +252,7 @@
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-between px-3 pt-3">
           <a href="{{ route('dashboard') }}" class="text-nowrap logo-img">
-            <img src="../assets/images/logos/logo.svg" alt="Sego Sambel Merdeka" />
+            <img src="../assets/images/logos/SuperStock.png" alt="Sego Sambel Merdeka" />
           </a>
           <div class="close-btn d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
             <i class="ti ti-x fs-8"></i>

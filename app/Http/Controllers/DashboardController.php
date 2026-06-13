@@ -187,23 +187,25 @@ class DashboardController extends Controller
         )->whereYear('tanggal_masuk', now()->year)
             ->groupBy('bulan')
             ->orderByRaw("MIN(tanggal_masuk)")
-            ->get()
-            ->toArray();
+            ->get();
 
-        if (empty($dataPersediaan)) {
-            $dataPersediaan = [
+        if ($dataPersediaan->isEmpty()) {
+            $dataPersediaan = collect([
                 ['bulan' => 'Jan', 'stok' => 0],
                 ['bulan' => 'Feb', 'stok' => 0],
                 ['bulan' => 'Mar', 'stok' => 0],
                 ['bulan' => 'Apr', 'stok' => 0],
                 ['bulan' => 'Mei', 'stok' => 0],
                 ['bulan' => 'Jun', 'stok' => 0],
-            ];
+            ]);
         }
+
+        $chartLabels = $dataPersediaan->pluck('bulan')->toArray();
+        $chartData = $dataPersediaan->pluck('stok')->map(fn($v) => (float) $v)->toArray();
 
         return view('dashboard.owner', compact(
             'amanCount', 'stokMenipis', 'rekomendasiRestock',
-            'ringkasanFifo', 'ringkasanMinMax', 'dataPersediaan'
+            'ringkasanFifo', 'ringkasanMinMax', 'chartLabels', 'chartData'
         ));
     }
 

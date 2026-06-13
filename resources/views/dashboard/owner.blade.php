@@ -125,38 +125,51 @@
 @push('scripts')
 <script>
   $(document).ready(function() {
-    var options = {
-      chart: { type: 'area', height: 280, toolbar: { show: false } },
-      series: [{
-        name: 'Total Persediaan',
-        data: @json(collect($dataPersediaan)->pluck('stok')->map(fn($v) => (float) $v)->values())
-      }],
-      xaxis: {
-        categories: @json(collect($dataPersediaan)->pluck('bulan')),
-      },
-      colors: ['#5D87FF'],
-      fill: {
-        type: 'gradient',
-        gradient: {
-          shadeIntensity: 1,
-          opacityFrom: 0.5,
-          opacityTo: 0.1
-        }
-      },
-      dataLabels: { enabled: false },
-      stroke: { curve: 'smooth', width: 2 },
-      markers: { size: 4 }
-    };
-    try {
-      var chart = new ApexCharts(document.querySelector("#ownerChart"), options);
-      chart.render().then(function() {
-        document.getElementById('ownerChartLoader').style.display = 'none';
-      }).catch(function() {
-        document.getElementById('ownerChartLoader').style.display = 'none';
-      });
-    } catch(e) {
-      document.getElementById('ownerChartLoader').style.display = 'none';
-    }
+    setTimeout(function() {
+      var loaderEl = document.getElementById('ownerChartLoader');
+      var timeout = setTimeout(function() {
+        if (loaderEl) loaderEl.style.display = 'none';
+      }, 5000);
+
+      var options = {
+        chart: { type: 'area', height: 280, toolbar: { show: false } },
+        series: [{
+          name: 'Total Persediaan',
+          data: @json($chartData)
+        }],
+        xaxis: {
+          categories: @json($chartLabels),
+        },
+        colors: ['#5D87FF'],
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shadeIntensity: 1,
+            opacityFrom: 0.5,
+            opacityTo: 0.1
+          }
+        },
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: 2 },
+        markers: { size: 4 }
+      };
+      try {
+        var chart = new ApexCharts(document.querySelector("#ownerChart"), options);
+        chart.render().then(function() {
+          clearTimeout(timeout);
+          if (loaderEl) loaderEl.style.display = 'none';
+          setTimeout(function() {
+            window.dispatchEvent(new Event('resize'));
+          }, 100);
+        }).catch(function() {
+          clearTimeout(timeout);
+          if (loaderEl) loaderEl.style.display = 'none';
+        });
+      } catch(e) {
+        clearTimeout(timeout);
+        if (loaderEl) loaderEl.style.display = 'none';
+      }
+    });
   });
 </script>
 @endpush
