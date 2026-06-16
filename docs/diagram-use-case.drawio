@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-06-14T00:00:00.000Z" agent="Mozilla/5.0" version="24.0.2">
+  <diagram name="Use Case Diagram" id="superstock-use-case">
+    <mxGraphModel dx="1420" dy="1020" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="826" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- System Boundary -->
+        <mxCell id="boundary" value="SuperStock - Sistem Pengelolaan Stok" style="rounded=1;whiteSpace=wrap;html=1;dashed=0;fillColor=#E6F0FA;strokeColor=#5D87FF;fontStyle=1;fontSize=14;verticalAlign=top;align=left;spacingTop=10;spacingLeft=10;" parent="1" vertex="1">
+          <mxGeometry x="250" y="40" width="700" height="740" as="geometry" />
+        </mxCell>
+
+        <!-- ACTORS -->
+        <!-- Admin -->
+        <mxCell id="actor-admin" value="Admin" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=14;fontStyle=1;fillColor=#5D87FF;strokeColor=#2D4FA0;" parent="1" vertex="1">
+          <mxGeometry x="80" y="120" width="50" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Karyawan -->
+        <mxCell id="actor-karyawan" value="Karyawan" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=14;fontStyle=1;fillColor=#5D87FF;strokeColor=#2D4FA0;" parent="1" vertex="1">
+          <mxGeometry x="80" y="340" width="50" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Owner -->
+        <mxCell id="actor-owner" value="Owner" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=14;fontStyle=1;fillColor=#5D87FF;strokeColor=#2D4FA0;" parent="1" vertex="1">
+          <mxGeometry x="80" y="560" width="50" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- USE CASES - Row 1: Shared -->
+        <mxCell id="uc-login" value="Login" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5D87FF;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="320" y="60" width="140" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-logout" value="Logout" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5D87FF;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="530" y="60" width="140" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Row 2: Admin CRUD -->
+        <mxCell id="uc-user" value="Kelola Data User (CRUD)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5D87FF;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="320" y="130" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-supplier" value="Kelola Data Supplier (CRUD)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5D87FF;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="530" y="130" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-satuan" value="Kelola Data Satuan (CRUD)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5D87FF;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="320" y="200" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-bahanbaku" value="Kelola Data Bahan Baku (CRUD)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5D87FF;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="530" y="200" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Row 3: Transactions -->
+        <mxCell id="uc-stokmasuk" value="Catat Stok Masuk" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5D87FF;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="320" y="280" width="150" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-stokkeluar" value="Catat Stok Keluar (FIFO)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5D87FF;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="530" y="280" width="150" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Include: Update Stock -->
+        <mxCell id="uc-updatestock" value="Update Stok Bahan Baku" style="ellipse;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#888888;fontSize=11;dashed=1;" parent="1" vertex="1">
+          <mxGeometry x="320" y="370" width="150" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-buatbatch" value="Buat Batch FIFO" style="ellipse;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#888888;fontSize=11;dashed=1;" parent="1" vertex="1">
+          <mxGeometry x="530" y="370" width="150" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Include: Check Stock & Allocate FIFO -->
+        <mxCell id="uc-cekstok" value="Cek Ketersediaan Stok" style="ellipse;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#888888;fontSize=11;dashed=1;" parent="1" vertex="1">
+          <mxGeometry x="320" y="460" width="150" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-alokasi" value="Alokasi FIFO Batch" style="ellipse;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#888888;fontSize=11;dashed=1;" parent="1" vertex="1">
+          <mxGeometry x="530" y="460" width="150" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Row 4: Monitoring -->
+        <mxCell id="uc-fifo" value="Lihat Monitoring FIFO" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5D87FF;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="320" y="540" width="150" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-minmax" value="Lihat Analisis Min-Max" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5D87FF;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="530" y="540" width="150" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Row 5: Reports -->
+        <mxCell id="uc-laporan" value="Lihat &amp; Ekspor Laporan (PDF/Excel)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5D87FF;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="410" y="620" width="180" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ARROWS: Admin to Use Cases -->
+        <mxCell id="edge-admin-login" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-admin" target="uc-login" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-admin-logout" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-admin" target="uc-logout" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-admin-user" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-admin" target="uc-user" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-admin-supplier" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-admin" target="uc-supplier" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-admin-satuan" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-admin" target="uc-satuan" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-admin-bahanbaku" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-admin" target="uc-bahanbaku" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-admin-stokmasuk" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-admin" target="uc-stokmasuk" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-admin-stokkeluar" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-admin" target="uc-stokkeluar" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-admin-fifo" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-admin" target="uc-fifo" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-admin-minmax" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-admin" target="uc-minmax" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-admin-laporan" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-admin" target="uc-laporan" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ARROWS: Karyawan to Use Cases -->
+        <mxCell id="edge-karyawan-login" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-karyawan" target="uc-login" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-karyawan-logout" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-karyawan" target="uc-logout" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-karyawan-stokmasuk" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-karyawan" target="uc-stokmasuk" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-karyawan-stokkeluar" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-karyawan" target="uc-stokkeluar" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-karyawan-fifo" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-karyawan" target="uc-fifo" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ARROWS: Owner to Use Cases -->
+        <mxCell id="edge-owner-login" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-owner" target="uc-login" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-owner-logout" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-owner" target="uc-logout" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-owner-fifo" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-owner" target="uc-fifo" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-owner-minmax" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-owner" target="uc-minmax" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-owner-laporan" style="edgeStyle=elbowEdgeStyle;rounded=0;jumpStyle=none;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#2D4FA0;strokeWidth=2;" parent="1" source="actor-owner" target="uc-laporan" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- INCLUDE ARROWS (dashed) -->
+        <!-- Stok Masuk -> Update Stok -->
+        <mxCell id="include-1" value="&lt;&lt;include&gt;&gt;" style="edgeStyle=elbowEdgeStyle;rounded=0;dashed=1;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#888888;fontSize=11;fontStyle=0;labelBackgroundColor=#FFFFFF;" parent="1" source="uc-stokmasuk" target="uc-updatestock" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- Stok Masuk -> Buat Batch -->
+        <mxCell id="include-2" value="&lt;&lt;include&gt;&gt;" style="edgeStyle=elbowEdgeStyle;rounded=0;dashed=1;html=1;exitX=1;exitY=1;entryX=0.5;entryY=0;strokeColor=#888888;fontSize=11;fontStyle=0;labelBackgroundColor=#FFFFFF;" parent="1" source="uc-stokmasuk" target="uc-buatbatch" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- Stok Keluar -> Cek Stok -->
+        <mxCell id="include-3" value="&lt;&lt;include&gt;&gt;" style="edgeStyle=elbowEdgeStyle;rounded=0;dashed=1;html=1;exitX=0.5;exitY=1;entryX=0.5;entryY=0;strokeColor=#888888;fontSize=11;fontStyle=0;labelBackgroundColor=#FFFFFF;" parent="1" source="uc-stokkeluar" target="uc-cekstok" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <!-- Stok Keluar -> Alokasi FIFO -->
+        <mxCell id="include-4" value="&lt;&lt;include&gt;&gt;" style="edgeStyle=elbowEdgeStyle;rounded=0;dashed=1;html=1;exitX=1;exitY=1;entryX=0.5;entryY=0;strokeColor=#888888;fontSize=11;fontStyle=0;labelBackgroundColor=#FFFFFF;" parent="1" source="uc-stokkeluar" target="uc-alokasi" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- SECTION LABELS -->
+        <mxCell id="label-shared" value="— Autentikasi —" style="text;html=1;fillColor=none;strokeColor=none;fontSize=11;fontStyle=1;align=center;verticalAlign=middle;fontColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="410" y="50" width="140" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="label-admin-only" value="— Admin Only (CRUD) —" style="text;html=1;fillColor=none;strokeColor=none;fontSize=11;fontStyle=1;align=center;verticalAlign=middle;fontColor=#CC0000;" parent="1" vertex="1">
+          <mxGeometry x="410" y="118" width="140" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="label-transaction" value="— Transaksi Stok —" style="text;html=1;fillColor=none;strokeColor=none;fontSize=11;fontStyle=1;align=center;verticalAlign=middle;fontColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="410" y="268" width="140" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="label-include" value="— Include (Proses Otomatis) —" style="text;html=1;fillColor=none;strokeColor=none;fontSize=11;fontStyle=1;align=center;verticalAlign=middle;fontColor=#888888;" parent="1" vertex="1">
+          <mxGeometry x="410" y="358" width="140" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="label-monitoring" value="— Monitoring &amp; Laporan —" style="text;html=1;fillColor=none;strokeColor=none;fontSize=11;fontStyle=1;align=center;verticalAlign=middle;fontColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="410" y="530" width="140" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- LEGEND -->
+        <mxCell id="legend" value="&lt;b&gt;Keterangan:&lt;/b&gt;&lt;br&gt;— Semua aktor bisa akses Login/Logout, Monitoring FIFO&lt;br&gt;— Hanya Admin yang bisa CRUD data master (User, Supplier, Satuan, Bahan Baku)&lt;br&gt;— Admin &amp; Karyawan bisa catat transaksi stok masuk/keluar&lt;br&gt;— Hanya Admin &amp; Owner yang bisa lihat Min-Max &amp; Laporan&lt;br&gt;— &amp;lt;&amp;lt;include&amp;gt;&amp;gt; = proses otomatis sistem" style="text;html=1;fillColor=#F0F4FF;strokeColor=#5D87FF;rounded=1;fontSize=11;align=left;verticalAlign=top;spacing=8;" parent="1" vertex="1">
+          <mxGeometry x="80" y="650" width="780" height="110" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -17,6 +17,7 @@ class BahanBaku extends Model
         'stok_saat_ini',
         'stok_minimum',
         'stok_maksimum',
+        'lead_time',
     ];
 
     protected function casts(): array
@@ -25,6 +26,9 @@ class BahanBaku extends Model
             'stok_saat_ini' => 'decimal:2',
             'stok_minimum' => 'decimal:2',
             'stok_maksimum' => 'decimal:2',
+            'safety_stock' => 'decimal:2',
+            'reorder_point' => 'decimal:2',
+            'lead_time' => 'integer',
         ];
     }
 

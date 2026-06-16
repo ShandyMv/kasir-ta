@@ -174,10 +174,13 @@ class DashboardController extends Controller
             'batchKritis' => $batchKritis,
         ];
 
+        $segeraCount = $this->minMax->countSegeraROP();
+        $kritisCount = $this->minMax->countKritis();
+
         $ringkasanMinMax = [
             'aman' => $amanCount,
-            'waspada' => 0,
-            'kritis' => $restockCount,
+            'waspada' => $segeraCount,
+            'kritis' => $kritisCount,
             'berlebih' => $berlebihCount,
         ];
 

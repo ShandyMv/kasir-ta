@@ -179,22 +179,29 @@ function getStatusBahan($stok, $min, $max) {
               <div class="invalid-feedback">{{ $message }}</div>
             @enderror
           </div>
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label class="form-label">Stok Minimum <span class="text-danger">*</span></label>
-              <input type="number" step="0.01" name="stok_minimum" class="form-control @error('stok_minimum') is-invalid @enderror" placeholder="Min" value="{{ old('stok_minimum') }}" required>
-              @error('stok_minimum')
-                <div class="invalid-feedback">{{ $message }}</div>
-              @enderror
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Stok Minimum <span class="text-danger">*</span></label>
+                    <input type="number" step="0.01" name="stok_minimum" class="form-control @error('stok_minimum') is-invalid @enderror" placeholder="Min" value="{{ old('stok_minimum') }}" required>
+                    @error('stok_minimum')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Stok Maksimum <span class="text-danger">*</span></label>
+                    <input type="number" step="0.01" name="stok_maksimum" class="form-control @error('stok_maksimum') is-invalid @enderror" placeholder="Max" value="{{ old('stok_maksimum') }}" required>
+                    @error('stok_maksimum')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
             </div>
-            <div class="col-md-6 mb-3">
-              <label class="form-label">Stok Maksimum <span class="text-danger">*</span></label>
-              <input type="number" step="0.01" name="stok_maksimum" class="form-control @error('stok_maksimum') is-invalid @enderror" placeholder="Max" value="{{ old('stok_maksimum') }}" required>
-              @error('stok_maksimum')
-                <div class="invalid-feedback">{{ $message }}</div>
-              @enderror
+            <div class="mb-3">
+                <label class="form-label">Lead Time (hari)</label>
+                <input type="number" name="lead_time" class="form-control @error('lead_time') is-invalid @enderror" placeholder="Lama waktu pemesanan" value="{{ old('lead_time', 1) }}" min="1">
+                @error('lead_time')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
-          </div>
         </div>
         <div class="modal-footer border-0">
           <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
@@ -245,29 +252,36 @@ function getStatusBahan($stok, $min, $max) {
               <div class="invalid-feedback">{{ $message }}</div>
             @enderror
           </div>
-          <div class="row">
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Stok Saat Ini <span class="text-danger">*</span></label>
-              <input type="number" step="0.01" name="stok_saat_ini" class="form-control @error('stok_saat_ini') is-invalid @enderror" value="{{ old('stok_saat_ini', $b->stok_saat_ini) }}" required>
-              @error('stok_saat_ini')
-                <div class="invalid-feedback">{{ $message }}</div>
-              @enderror
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Stok Saat Ini <span class="text-danger">*</span></label>
+                    <input type="number" step="0.01" name="stok_saat_ini" class="form-control @error('stok_saat_ini') is-invalid @enderror" value="{{ old('stok_saat_ini', $b->stok_saat_ini) }}" required>
+                    @error('stok_saat_ini')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Stok Minimum <span class="text-danger">*</span></label>
+                    <input type="number" step="0.01" name="stok_minimum" class="form-control @error('stok_minimum') is-invalid @enderror" value="{{ old('stok_minimum', $b->stok_minimum) }}" required>
+                    @error('stok_minimum')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Stok Maksimum <span class="text-danger">*</span></label>
+                    <input type="number" step="0.01" name="stok_maksimum" class="form-control @error('stok_maksimum') is-invalid @enderror" value="{{ old('stok_maksimum', $b->stok_maksimum) }}" required>
+                    @error('stok_maksimum')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
             </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Stok Minimum <span class="text-danger">*</span></label>
-              <input type="number" step="0.01" name="stok_minimum" class="form-control @error('stok_minimum') is-invalid @enderror" value="{{ old('stok_minimum', $b->stok_minimum) }}" required>
-              @error('stok_minimum')
-                <div class="invalid-feedback">{{ $message }}</div>
-              @enderror
+            <div class="mb-3">
+                <label class="form-label">Lead Time (hari)</label>
+                <input type="number" name="lead_time" class="form-control @error('lead_time') is-invalid @enderror" value="{{ old('lead_time', $b->lead_time) }}" min="1">
+                @error('lead_time')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Stok Maksimum <span class="text-danger">*</span></label>
-              <input type="number" step="0.01" name="stok_maksimum" class="form-control @error('stok_maksimum') is-invalid @enderror" value="{{ old('stok_maksimum', $b->stok_maksimum) }}" required>
-              @error('stok_maksimum')
-                <div class="invalid-feedback">{{ $message }}</div>
-              @enderror
-            </div>
-          </div>
         </div>
         <div class="modal-footer border-0">
           <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>

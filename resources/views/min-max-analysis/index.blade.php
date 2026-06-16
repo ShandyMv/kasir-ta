@@ -1,30 +1,24 @@
 @php
-function getStatusStok($stok, $min, $max) {
-    if ($stok > $max) return ['label' => 'Berlebih', 'class' => 'dark'];
-    if ($stok < $min) return ['label' => 'Perlu Restock', 'class' => 'danger'];
-    return ['label' => 'Aman', 'class' => 'success'];
+function getStatusStok($code) {
+    $map = [
+        'BERLEBIH' => ['label' => 'Berlebih', 'class' => 'dark'],
+        'AMAN' => ['label' => 'Aman', 'class' => 'success'],
+        'SEGERA_ROP' => ['label' => 'Segera Restock', 'class' => 'warning'],
+        'KRITIS' => ['label' => 'Kritis', 'class' => 'danger'],
+    ];
+    return $map[$code] ?? ['label' => '-', 'class' => 'secondary'];
 }
 
-function getRekomendasi($stok, $min, $max) {
+function getRekomendasi($stok, $safety, $rop, $max) {
     if ($stok > $max) return ['text' => 'Hentikan order', 'class' => 'text-danger'];
-    if ($stok < $min) return ['text' => number_format($min - $stok, 0) . ' (segera)', 'class' => 'text-danger fw-medium'];
-    if ($stok >= $min && $stok <= $max) return ['text' => '-', 'class' => 'text-success'];
-    return ['text' => '-', 'class' => 'text-success'];
+    if ($stok > $rop) return ['text' => '-', 'class' => 'text-success'];
+    if ($stok > $safety) return ['text' => number_format($rop - $stok, 0) . ' (segera)', 'class' => 'text-warning fw-medium'];
+    return ['text' => number_format($safety - $stok, 0) . ' (kritis)', 'class' => 'text-danger fw-medium'];
 }
 
 function getProgress($stok, $max) {
     if ($max <= 0) return 0;
     return min(100, ($stok / $max) * 100);
-}
-
-$statAman = 0;
-$statRestock = 0;
-$statBerlebih = 0;
-
-foreach ($bahanBakus as $b) {
-    if ($b->stok_saat_ini > $b->stok_maksimum) $statBerlebih++;
-    elseif ($b->stok_saat_ini < $b->stok_minimum) $statRestock++;
-    else $statAman++;
 }
 @endphp
 
@@ -50,12 +44,12 @@ foreach ($bahanBakus as $b) {
   <div class="col-lg-3">
     <div class="card stat-card">
       <div class="card-body d-flex align-items-center">
-        <div class="card-icon bg-danger bg-opacity-10 me-3" style="color:#DC3545;">
-          <i class="ti ti-alert-triangle" style="font-size:1.8rem;"></i>
+        <div class="card-icon bg-warning bg-opacity-10 me-3" style="color:#FFAE1F;">
+          <i class="ti ti-alert-circle" style="font-size:1.8rem;"></i>
         </div>
         <div>
-          <h3 class="mb-0 fw-bold text-danger">{{ $statRestock }}</h3>
-          <small class="text-muted">Perlu Restock</small>
+          <h3 class="mb-0 fw-bold text-warning">{{ $statSegera }}</h3>
+          <small class="text-muted">Segera Restock</small>
         </div>
       </div>
     </div>
@@ -63,25 +57,25 @@ foreach ($bahanBakus as $b) {
   <div class="col-lg-3">
     <div class="card stat-card">
       <div class="card-body d-flex align-items-center">
-        <div class="card-icon bg-secondary bg-opacity-10 me-3" style="color:#6C757D;">
+        <div class="card-icon bg-danger bg-opacity-10 me-3" style="color:#DC3545;">
+          <i class="ti ti-alert-triangle" style="font-size:1.8rem;"></i>
+        </div>
+        <div>
+          <h3 class="mb-0 fw-bold text-danger">{{ $statKritis }}</h3>
+          <small class="text-muted">Kritis</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3">
+    <div class="card stat-card">
+      <div class="card-body d-flex align-items-center">
+        <div class="card-icon bg-dark bg-opacity-10 me-3" style="color:#6C757D;">
           <i class="ti ti-archive-up" style="font-size:1.8rem;"></i>
         </div>
         <div>
           <h3 class="mb-0 fw-bold text-dark">{{ $statBerlebih }}</h3>
           <small class="text-muted">Stok Berlebih</small>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-lg-3">
-    <div class="card stat-card">
-      <div class="card-body d-flex align-items-center">
-        <div class="card-icon bg-primary bg-opacity-10 me-3" style="color:#5D87FF;">
-          <i class="ti ti-box" style="font-size:1.8rem;"></i>
-        </div>
-        <div>
-          <h3 class="mb-0 fw-bold">{{ $bahanBakus->total() }}</h3>
-          <small class="text-muted">Total Bahan</small>
         </div>
       </div>
     </div>
@@ -101,11 +95,12 @@ foreach ($bahanBakus as $b) {
         <span class="input-group-text bg-transparent"><i class="ti ti-search"></i></span>
         <input type="text" name="search" class="form-control" placeholder="Cari bahan..." value="{{ $search }}">
       </div>
-      <select name="status" class="form-select" style="max-width:160px;" onchange="this.form.submit()">
+      <select name="status" class="form-select" style="max-width:180px;" onchange="this.form.submit()">
         <option value="">Semua Status</option>
-        <option value="aman" {{ $status === 'aman' ? 'selected' : '' }}>Aman</option>
-        <option value="restock" {{ $status === 'restock' ? 'selected' : '' }}>Perlu Restock</option>
-        <option value="berlebih" {{ $status === 'berlebih' ? 'selected' : '' }}>Berlebih</option>
+        <option value="AMAN" {{ $status === 'AMAN' ? 'selected' : '' }}>Aman</option>
+        <option value="SEGERA_ROP" {{ $status === 'SEGERA_ROP' ? 'selected' : '' }}>Segera Restock</option>
+        <option value="KRITIS" {{ $status === 'KRITIS' ? 'selected' : '' }}>Kritis</option>
+        <option value="BERLEBIH" {{ $status === 'BERLEBIH' ? 'selected' : '' }}>Berlebih</option>
       </select>
       <button type="submit" class="btn btn-outline-primary btn-sm">Cari</button>
       @if($search || $status)
@@ -120,19 +115,28 @@ foreach ($bahanBakus as $b) {
             <th>No</th>
             <th>Nama Bahan</th>
             <th>Current Stock</th>
-            <th>Minimum Stock</th>
-            <th>Maximum Stock</th>
+            <th>Lead Time</th>
+            <th>Rmax Daily</th>
+            <th>Safety Stock</th>
+            <th>Reorder Point</th>
+            <th>Min Stock</th>
+            <th>Max Stock</th>
             <th>Progress</th>
             <th>Status</th>
-            <th>Rekomendasi Order</th>
+            <th>Rekomendasi</th>
           </tr>
         </thead>
         <tbody>
           @forelse($bahanBakus as $i => $b)
             @php
-              $statusStok = getStatusStok($b->stok_saat_ini, $b->stok_minimum, $b->stok_maksimum);
-              $rekomendasi = getRekomendasi($b->stok_saat_ini, $b->stok_minimum, $b->stok_maksimum);
-              $progress = getProgress($b->stok_saat_ini, $b->stok_maksimum);
+              $statusStok = getStatusStok($b->status_code);
+              $rekomendasi = getRekomendasi(
+                  (float) $b->stok_saat_ini,
+                  (float) $b->safety_stock_calc,
+                  (float) $b->reorder_point_calc,
+                  (float) $b->stok_maksimum
+              );
+              $progress = getProgress((float) $b->stok_saat_ini, (float) $b->stok_maksimum);
             @endphp
           <tr>
             <td>{{ $bahanBakus->firstItem() + $i }}</td>
@@ -141,6 +145,10 @@ foreach ($bahanBakus as $b) {
               <span class="fw-bold">{{ number_format($b->stok_saat_ini, 0) }}</span>
               <small class="text-muted">{{ $b->satuan->nama_satuan }}</small>
             </td>
+            <td>{{ $b->lead_time }} hari</td>
+            <td class="fw-medium">{{ number_format($b->rmax_daily, 0) }}</td>
+            <td>{{ number_format($b->safety_stock_calc, 0) }}</td>
+            <td>{{ number_format($b->reorder_point_calc, 0) }}</td>
             <td>{{ number_format($b->stok_minimum, 0) }}</td>
             <td>{{ number_format($b->stok_maksimum, 0) }}</td>
             <td style="min-width:120px;">
@@ -166,7 +174,7 @@ foreach ($bahanBakus as $b) {
           </tr>
           @empty
           <tr>
-            <td colspan="8" class="text-center text-muted py-4">Belum ada data bahan baku.</td>
+            <td colspan="12" class="text-center text-muted py-4">Belum ada data bahan baku.</td>
           </tr>
           @endforelse
         </tbody>
@@ -174,7 +182,7 @@ foreach ($bahanBakus as $b) {
     </div>
 
     <div class="mt-3">
-      {{ $bahanBakus->appends(request()->query())->links() }}
+      {{ $bahanBakus->links() }}
     </div>
   </div>
 </div>

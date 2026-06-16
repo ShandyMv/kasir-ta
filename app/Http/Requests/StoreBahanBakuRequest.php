@@ -18,6 +18,7 @@ class StoreBahanBakuRequest extends FormRequest
             'satuan_id' => 'required|exists:satuans,id',
             'stok_minimum' => 'required|numeric|min:0',
             'stok_maksimum' => 'required|numeric|min:0|gte:stok_minimum',
+            'lead_time' => 'nullable|integer|min:1',
         ];
     }
 
