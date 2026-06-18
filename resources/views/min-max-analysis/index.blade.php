@@ -115,16 +115,16 @@ function getProgress($stok, $max) {
             <th>No</th>
             <th>Nama Bahan</th>
             <th>Current Stock</th>
-            <th>Lead Time</th>
-            <th>Rmax Daily</th>
-            <th>Safety Stock</th>
+            <th class="d-none">Lead Time</th>
+            <th class="d-none">Rmax Daily</th>
+            <th class="d-none">Safety Stock</th>
             <th>Min Stock</th>
             <th>Max Stock</th>
             <th>Order Qty</th>
             <th>Progress</th>
             <th>Status</th>
-            <th>Rekomendasi</th>
-            <th>Aksi</th>
+            <th class="d-none">Rekomendasi</th>
+            <th class="d-none">Aksi</th>
           </tr>
         </thead>
         <tbody>
@@ -146,9 +146,9 @@ function getProgress($stok, $max) {
               <span class="fw-bold">{{ number_format($b->stok_saat_ini, 0) }}</span>
               <small class="text-muted">{{ $b->satuan->nama_satuan }}</small>
             </td>
-            <td>{{ $b->lead_time_val }} hari</td>
-            <td class="fw-medium">{{ number_format($b->rmax_daily, 0) }}</td>
-            <td>{{ number_format($b->safety_stock_calc, 0) }}</td>
+            <td class="d-none">{{ $b->lead_time_val }} hari</td>
+            <td class="fw-medium d-none">{{ number_format($b->rmax_daily, 0) }}</td>
+            <td class="d-none">{{ number_format($b->safety_stock_calc, 0) }}</td>
             <td>{{ number_format($b->min_stock_calc, 0) }}</td>
             <td>{{ number_format($b->max_stock_calc, 0) }}</td>
             <td>
@@ -175,14 +175,14 @@ function getProgress($stok, $max) {
                 {{ $statusStok['label'] }}
               </span>
             </td>
-            <td class="{{ $rekomendasi['class'] }}">
+            <td class="{{ $rekomendasi['class'] }} d-none">
               @if($rekomendasi['text'] === '-')
                 <i class="ti ti-check me-1"></i>Aman
               @else
                 {{ $rekomendasi['text'] }}
               @endif
             </td>
-            <td>
+            <td class="d-none">
               @if($b->status_code === 'SEGERA_ROP' || $b->status_code === 'KRITIS')
                 <form action="{{ route('min-max-analysis.apply', $b->id) }}" method="POST" class="d-inline">
                   @csrf
