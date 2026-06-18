@@ -32,6 +32,8 @@ class BahanBakuController extends Controller
         $data = $request->validated();
         $data['kode_bahan'] = $kode;
         $data['stok_saat_ini'] = 0;
+        $data['stok_minimum'] ??= 0;
+        $data['stok_maksimum'] ??= 0;
 
         BahanBaku::create($data);
         return redirect()->route('bahan-baku')->with('success', 'Bahan baku berhasil ditambahkan.');

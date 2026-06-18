@@ -62,6 +62,7 @@ Route::middleware('auth')->group(function () {
     // Admin + Owner
     Route::middleware('role:admin,owner')->group(function () {
         Route::get('/min-max-analysis', [MinMaxAnalysisController::class, 'index'])->name('min-max-analysis');
+        Route::post('/min-max-analysis/{bahanBaku}/apply', [MinMaxAnalysisController::class, 'apply'])->name('min-max-analysis.apply');
         Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan');
         Route::get('/laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('laporan.export-pdf');
         Route::get('/laporan/export-excel', [LaporanController::class, 'exportExcel'])->name('laporan.export-excel');

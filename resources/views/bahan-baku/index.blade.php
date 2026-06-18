@@ -181,15 +181,15 @@ function getStatusBahan($stok, $min, $max) {
           </div>
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label class="form-label">Stok Minimum <span class="text-danger">*</span></label>
-                    <input type="number" step="0.01" name="stok_minimum" class="form-control @error('stok_minimum') is-invalid @enderror" placeholder="Min" value="{{ old('stok_minimum') }}" required>
+                    <label class="form-label">Stok Minimum <small class="text-muted fst-italic">(opsional)</small></label>
+                    <input type="number" step="0.01" name="stok_minimum" class="form-control @error('stok_minimum') is-invalid @enderror" placeholder="Kosongi jika belum tahu" value="{{ old('stok_minimum') }}">
                     @error('stok_minimum')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label class="form-label">Stok Maksimum <span class="text-danger">*</span></label>
-                    <input type="number" step="0.01" name="stok_maksimum" class="form-control @error('stok_maksimum') is-invalid @enderror" placeholder="Max" value="{{ old('stok_maksimum') }}" required>
+                    <label class="form-label">Stok Maksimum <small class="text-muted fst-italic">(opsional)</small></label>
+                    <input type="number" step="0.01" name="stok_maksimum" class="form-control @error('stok_maksimum') is-invalid @enderror" placeholder="Kosongi jika belum tahu" value="{{ old('stok_maksimum') }}">
                     @error('stok_maksimum')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror

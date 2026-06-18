@@ -16,8 +16,8 @@ class StoreBahanBakuRequest extends FormRequest
         return [
             'nama_bahan' => 'required|string|max:255',
             'satuan_id' => 'required|exists:satuans,id',
-            'stok_minimum' => 'required|numeric|min:0',
-            'stok_maksimum' => 'required|numeric|min:0|gte:stok_minimum',
+            'stok_minimum' => 'nullable|numeric|min:0',
+            'stok_maksimum' => 'nullable|numeric|min:0|prohibited_if:stok_minimum,null',
             'lead_time' => 'nullable|integer|min:1',
         ];
     }
@@ -28,9 +28,7 @@ class StoreBahanBakuRequest extends FormRequest
             'nama_bahan.required' => 'Nama bahan wajib diisi.',
             'satuan_id.required' => 'Satuan wajib dipilih.',
             'satuan_id.exists' => 'Satuan tidak valid.',
-            'stok_minimum.required' => 'Stok minimum wajib diisi.',
-            'stok_maksimum.required' => 'Stok maksimum wajib diisi.',
-            'stok_maksimum.gte' => 'Stok maksimum harus lebih besar atau sama dengan stok minimum.',
+            'stok_maksimum.prohibited_if' => 'Stok maksimum tidak boleh diisi jika stok minimum kosong.',
         ];
     }
 }

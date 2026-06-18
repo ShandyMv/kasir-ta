@@ -29,20 +29,34 @@ class MinMaxAnalysisController extends Controller
 
         $allBahanIds = $query->pluck('id')->toArray();
         $rmaxData = $this->minMax->getRmaxDaily($allBahanIds);
+        $rataData = $this->minMax->getRataRataDaily($allBahanIds);
 
         $allBahan = $query->get();
 
         $processed = collect();
         foreach ($allBahan as $b) {
             $rmax = $rmaxData[$b->id] ?? 0;
+            $rata = $rataData[$b->id] ?? 0;
+            $lt = $b->lead_time;
+
+            $b->lead_time_val = $lt;
             $b->rmax_daily = $rmax;
-            $b->safety_stock_calc = round($rmax * $b->lead_time, 2);
-            $b->reorder_point_calc = round($b->stok_minimum + $b->safety_stock_calc, 2);
+            $b->rata_rata = $rata;
+
+            $ss = round(($rmax - $rata) * $lt, 2);
+            $min = round($rmax * $lt, 2);
+            $max = round($ss + ($rmax * $lt), 2);
+
+            $b->safety_stock_calc = $ss;
+            $b->min_stock_calc = $min;
+            $b->max_stock_calc = $max;
+            $b->order_qty = round($max - $min, 2);
+
             $b->status_code = $this->minMax->analyzeDynamic(
                 (float) $b->stok_saat_ini,
-                (float) $b->safety_stock_calc,
-                (float) $b->reorder_point_calc,
-                (float) $b->stok_maksimum
+                (float) $ss,
+                (float) $min,
+                (float) $max
             );
             $processed->push($b);
         }
@@ -72,5 +86,20 @@ class MinMaxAnalysisController extends Controller
             'bahanBakus', 'search', 'status',
             'statAman', 'statSegera', 'statKritis', 'statBerlebih'
         ));
+    }
+
+    public function apply(Request $request, BahanBaku $bahanBaku)
+    {
+        $data = $request->validate([
+            'min_stock' => 'required|numeric|min:0',
+            'max_stock' => 'required|numeric|min:0|gte:min_stock',
+        ]);
+
+        $bahanBaku->update([
+            'stok_minimum' => $data['min_stock'],
+            'stok_maksimum' => $data['max_stock'],
+        ]);
+
+        return back()->with('success', 'Stok minimum & maksimum berhasil diterapkan.');
     }
 }

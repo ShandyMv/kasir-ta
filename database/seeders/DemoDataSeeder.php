@@ -61,31 +61,31 @@ class DemoDataSeeder extends Seeder
 
         $bahanList = [
             // ===================== AMAN (5) — stok > ROP =====================
-            // 1. Beras — 3 masuk, 2 keluar, LT=2
+            // 1. Beras — 3 masuk, 2 keluar
             ['Beras', 'BB001', 'Kg', 50, 200, 2, [
                 [80, 48, 0], [50, 22, 0], [30, 5, 0],
             ], [
                 [20, 10], [15, 3],
             ]],
-            // 2. Telur — 3 masuk, 2 keluar, LT=2
+            // 2. Telur — 3 masuk, 2 keluar
             ['Telur', 'BB002', 'Butir', 100, 400, 2, [
                 [150, 50, 1], [120, 24, 1], [80, 7, 1],
             ], [
                 [40, 12], [30, 4],
             ]],
-            // 3. Ayam — 3 masuk, 2 keluar, LT=2
+            // 3. Ayam — 3 masuk, 2 keluar
             ['Ayam', 'BB003', 'Ekor', 20, 80, 2, [
                 [30, 46, 1], [20, 20, 1], [15, 4, 1],
             ], [
                 [8, 8], [5, 3],
             ]],
-            // 4. Tempe — 3 masuk, 2 keluar, LT=2
+            // 4. Tempe — 3 masuk, 2 keluar
             ['Tempe', 'BB004', 'Buah', 20, 60, 2, [
                 [30, 44, 4], [25, 18, 4], [15, 6, 4],
             ], [
                 [8, 9], [5, 2],
             ]],
-            // 5. Tahu — 3 masuk, 2 keluar, LT=2
+            // 5. Tahu — 3 masuk, 2 keluar
             ['Tahu', 'BB005', 'Buah', 30, 100, 2, [
                 [40, 42, 4], [30, 16, 4], [20, 8, 4],
             ], [
@@ -93,31 +93,31 @@ class DemoDataSeeder extends Seeder
             ]],
 
             // ===================== SEGERA_ROP (5) — SS < stok ≤ ROP =====================
-            // 6. Udang — 2 masuk, 2 keluar, LT=1
+            // 6. Udang — 2 masuk, 2 keluar
             ['Udang', 'BB006', 'Kg', 10, 40, 1, [
                 [15, 52, 3], [12, 22, 3],
             ], [
                 [8, 6], [7, 2],
             ]],
-            // 7. Ikan Kembung — 2 masuk, 1 keluar, LT=2
+            // 7. Ikan Kembung — 2 masuk, 1 keluar
             ['Ikan Kembung', 'BB007', 'Ekor', 10, 40, 2, [
                 [12, 47, 8], [10, 21, 8],
             ], [
                 [7, 5],
             ]],
-            // 8. Cabai Merah — 3 masuk, 2 keluar, LT=1
+            // 8. Cabai Merah — 3 masuk, 2 keluar
             ['Cabai Merah', 'BB008', 'Kg', 15, 50, 1, [
                 [10, 55, 2], [8, 26, 2], [6, 10, 2],
             ], [
                 [6, 6], [5, 2],
             ]],
-            // 9. Bebek — 3 masuk, 2 keluar, LT=1
+            // 9. Bebek — 3 masuk, 2 keluar
             ['Bebek', 'BB010', 'Ekor', 15, 50, 1, [
                 [12, 54, 7], [10, 28, 7], [8, 14, 7],
             ], [
                 [9, 10], [7, 4],
             ]],
-            // 10. Lele — 2 masuk, 1 keluar, LT=1
+            // 10. Lele — 2 masuk, 1 keluar
             ['Lele', 'BB012', 'Ekor', 15, 40, 1, [
                 [10, 45, 8], [8, 19, 8],
             ], [
@@ -125,31 +125,31 @@ class DemoDataSeeder extends Seeder
             ]],
 
             // ===================== KRITIS (5) — stok ≤ SS =====================
-            // 11. Cabai Rawit — 3 masuk, 2 keluar, LT=1
+            // 11. Cabai Rawit — 3 masuk, 2 keluar
             ['Cabai Rawit', 'BB009', 'Kg', 10, 40, 1, [
                 [5, 53, 2], [4, 24, 2], [3, 12, 2],
             ], [
                 [6, 8], [5, 3],
             ]],
-            // 12. Cumi — 2 masuk, 2 keluar, LT=1
+            // 12. Cumi — 2 masuk, 2 keluar
             ['Cumi', 'BB011', 'Kg', 10, 30, 1, [
                 [10, 56, 3], [6, 28, 3],
             ], [
                 [8, 7], [5, 2],
             ]],
-            // 13. Jeruk Nipis — 2 masuk, 1 keluar, LT=1
+            // 13. Jeruk Nipis — 2 masuk, 1 keluar
             ['Jeruk Nipis', 'BB013', 'Kg', 5, 20, 1, [
                 [4, 57, 9], [3, 29, 9],
             ], [
                 [5, 8],
             ]],
-            // 14. Kemangi — 2 masuk, 2 keluar, LT=1
+            // 14. Kemangi — 2 masuk, 2 keluar
             ['Kemangi', 'BB018', 'Ikat', 5, 15, 1, [
                 [12, 43, 6], [10, 15, 6],
             ], [
                 [12, 7], [10, 5],
             ]],
-            // 15. Daun Jeruk — 2 masuk, 2 keluar, LT=1
+            // 15. Daun Jeruk — 2 masuk, 2 keluar
             ['Daun Jeruk', 'BB020', 'Ikat', 3, 10, 1, [
                 [10, 39, 6], [8, 13, 6],
             ], [
@@ -157,31 +157,31 @@ class DemoDataSeeder extends Seeder
             ]],
 
             // ===================== BERLEBIH (5) — stok > max =====================
-            // 16. Daging Sapi — 3 masuk, 1 keluar, LT=1
+            // 16. Daging Sapi — 3 masuk, 1 keluar
             ['Daging Sapi', 'BB014', 'Kg', 10, 30, 1, [
                 [22, 44, 5], [18, 17, 5], [12, 2, 5],
             ], [
                 [5, 9],
             ]],
-            // 17. Kangkung — 3 masuk, 1 keluar, LT=1
+            // 17. Kangkung — 3 masuk, 1 keluar
             ['Kangkung', 'BB015', 'Ikat', 5, 20, 1, [
                 [14, 40, 6], [10, 15, 6], [8, 1, 6],
             ], [
                 [4, 6],
             ]],
-            // 18. Bayam — 2 masuk, 1 keluar, LT=1
+            // 18. Bayam — 2 masuk, 1 keluar
             ['Bayam', 'BB016', 'Ikat', 5, 15, 1, [
                 [12, 38, 6], [10, 14, 6],
             ], [
                 [2, 7],
             ]],
-            // 19. Kol — 2 masuk, 1 keluar, LT=1
+            // 19. Kol — 2 masuk, 1 keluar
             ['Kol', 'BB017', 'Kg', 10, 25, 1, [
                 [18, 36, 2], [14, 12, 2],
             ], [
                 [3, 8],
             ]],
-            // 20. Kacang Tanah — 2 masuk, 1 keluar, LT=1
+            // 20. Kacang Tanah — 2 masuk, 1 keluar
             ['Kacang Tanah', 'BB019', 'Kg', 10, 30, 1, [
                 [22, 35, 9], [18, 11, 9],
             ], [

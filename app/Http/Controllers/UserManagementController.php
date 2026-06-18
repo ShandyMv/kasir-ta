@@ -5,15 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UserManagementRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class UserManagementController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('role:admin');
-    }
-
     public function index(Request $request)
     {
         $search = $request->get('search');
@@ -29,13 +23,7 @@ class UserManagementController extends Controller
 
     public function store(UserManagementRequest $request)
     {
-        User::create([
-            'name' => $request->name,
-            'username' => $request->username,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-        ]);
+        User::create($request->validated());
 
         return redirect()->route('user-management')->with('success', 'User berhasil ditambahkan.');
     }
@@ -44,9 +32,7 @@ class UserManagementController extends Controller
     {
         $data = $request->validated();
 
-        if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
-        } else {
+        if (!$request->filled('password')) {
             unset($data['password']);
         }
 

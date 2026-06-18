@@ -9,10 +9,10 @@ function getStatusStok($code) {
     return $map[$code] ?? ['label' => '-', 'class' => 'secondary'];
 }
 
-function getRekomendasi($stok, $safety, $rop, $max) {
+function getRekomendasi($stok, $safety, $min, $max) {
     if ($stok > $max) return ['text' => 'Hentikan order', 'class' => 'text-danger'];
-    if ($stok > $rop) return ['text' => '-', 'class' => 'text-success'];
-    if ($stok > $safety) return ['text' => number_format($rop - $stok, 0) . ' (segera)', 'class' => 'text-warning fw-medium'];
+    if ($stok > $min) return ['text' => '-', 'class' => 'text-success'];
+    if ($stok > $safety) return ['text' => number_format($min - $stok, 0) . ' (segera)', 'class' => 'text-warning fw-medium'];
     return ['text' => number_format($safety - $stok, 0) . ' (kritis)', 'class' => 'text-danger fw-medium'];
 }
 
@@ -118,12 +118,13 @@ function getProgress($stok, $max) {
             <th>Lead Time</th>
             <th>Rmax Daily</th>
             <th>Safety Stock</th>
-            <th>Reorder Point</th>
             <th>Min Stock</th>
             <th>Max Stock</th>
+            <th>Order Qty</th>
             <th>Progress</th>
             <th>Status</th>
             <th>Rekomendasi</th>
+            <th>Aksi</th>
           </tr>
         </thead>
         <tbody>
@@ -133,10 +134,10 @@ function getProgress($stok, $max) {
               $rekomendasi = getRekomendasi(
                   (float) $b->stok_saat_ini,
                   (float) $b->safety_stock_calc,
-                  (float) $b->reorder_point_calc,
-                  (float) $b->stok_maksimum
+                  (float) $b->min_stock_calc,
+                  (float) $b->max_stock_calc
               );
-              $progress = getProgress((float) $b->stok_saat_ini, (float) $b->stok_maksimum);
+              $progress = getProgress((float) $b->stok_saat_ini, (float) $b->max_stock_calc);
             @endphp
           <tr>
             <td>{{ $bahanBakus->firstItem() + $i }}</td>
@@ -145,12 +146,22 @@ function getProgress($stok, $max) {
               <span class="fw-bold">{{ number_format($b->stok_saat_ini, 0) }}</span>
               <small class="text-muted">{{ $b->satuan->nama_satuan }}</small>
             </td>
-            <td>{{ $b->lead_time }} hari</td>
+            <td>{{ $b->lead_time_val }} hari</td>
             <td class="fw-medium">{{ number_format($b->rmax_daily, 0) }}</td>
             <td>{{ number_format($b->safety_stock_calc, 0) }}</td>
-            <td>{{ number_format($b->reorder_point_calc, 0) }}</td>
-            <td>{{ number_format($b->stok_minimum, 0) }}</td>
-            <td>{{ number_format($b->stok_maksimum, 0) }}</td>
+            <td>{{ number_format($b->min_stock_calc, 0) }}</td>
+            <td>{{ number_format($b->max_stock_calc, 0) }}</td>
+            <td>
+              @if($b->status_code === 'SEGERA_ROP' || $b->status_code === 'KRITIS')
+                @if($b->order_qty > 0)
+                  {{ number_format($b->order_qty, 0) }}
+                @else
+                  -
+                @endif
+              @else
+                -
+              @endif
+            </td>
             <td style="min-width:120px;">
               <div class="d-flex align-items-center gap-2">
                 <div class="progress" style="width:80px;height:8px;">
@@ -171,10 +182,24 @@ function getProgress($stok, $max) {
                 {{ $rekomendasi['text'] }}
               @endif
             </td>
+            <td>
+              @if($b->status_code === 'SEGERA_ROP' || $b->status_code === 'KRITIS')
+                <form action="{{ route('min-max-analysis.apply', $b->id) }}" method="POST" class="d-inline">
+                  @csrf
+                  <input type="hidden" name="min_stock" value="{{ $b->min_stock_calc }}">
+                  <input type="hidden" name="max_stock" value="{{ $b->max_stock_calc }}">
+                  <button type="submit" class="btn btn-sm btn-success">
+                    <i class="ti ti-check"></i> Terapkan
+                  </button>
+                </form>
+              @else
+                <span class="text-muted small">-</span>
+              @endif
+            </td>
           </tr>
           @empty
           <tr>
-            <td colspan="12" class="text-center text-muted py-4">Belum ada data bahan baku.</td>
+            <td colspan="13" class="text-center text-muted py-4">Belum ada data bahan baku.</td>
           </tr>
           @endforelse
         </tbody>
