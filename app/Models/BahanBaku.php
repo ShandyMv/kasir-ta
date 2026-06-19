@@ -18,6 +18,7 @@ class BahanBaku extends Model
         'stok_minimum',
         'stok_maksimum',
         'lead_time',
+        'hari_kedaluwarsa',
     ];
 
     protected function casts(): array
@@ -29,6 +30,7 @@ class BahanBaku extends Model
             'safety_stock' => 'decimal:2',
             'reorder_point' => 'decimal:2',
             'lead_time' => 'integer',
+            'hari_kedaluwarsa' => 'integer',
         ];
     }
 

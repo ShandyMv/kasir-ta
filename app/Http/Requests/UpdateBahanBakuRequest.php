@@ -20,6 +20,7 @@ class UpdateBahanBakuRequest extends FormRequest
             'stok_minimum' => 'required|numeric|min:0',
             'stok_maksimum' => 'required|numeric|min:0|gte:stok_minimum',
             'lead_time' => 'nullable|integer|min:1',
+            'hari_kedaluwarsa' => 'required|integer|min:1',
         ];
     }
 

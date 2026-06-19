@@ -202,6 +202,13 @@ function getStatusBahan($stok, $min, $max) {
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+            <div class="mb-3">
+                <label class="form-label">Umur Simpan (hari) <span class="text-danger">*</span></label>
+                <input type="number" name="hari_kedaluwarsa" class="form-control @error('hari_kedaluwarsa') is-invalid @enderror" placeholder="Contoh: 3 untuk tahu, 90 untuk beras" value="{{ old('hari_kedaluwarsa', 30) }}" min="1" required>
+                @error('hari_kedaluwarsa')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
         </div>
         <div class="modal-footer border-0">
           <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
@@ -279,6 +286,13 @@ function getStatusBahan($stok, $min, $max) {
                 <label class="form-label">Lead Time (hari)</label>
                 <input type="number" name="lead_time" class="form-control @error('lead_time') is-invalid @enderror" value="{{ old('lead_time', $b->lead_time) }}" min="1">
                 @error('lead_time')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Umur Simpan (hari) <span class="text-danger">*</span></label>
+                <input type="number" name="hari_kedaluwarsa" class="form-control @error('hari_kedaluwarsa') is-invalid @enderror" value="{{ old('hari_kedaluwarsa', $b->hari_kedaluwarsa) }}" min="1" required>
+                @error('hari_kedaluwarsa')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>

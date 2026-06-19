@@ -19,6 +19,7 @@ class StoreBahanBakuRequest extends FormRequest
             'stok_minimum' => 'nullable|numeric|min:0',
             'stok_maksimum' => 'nullable|numeric|min:0|prohibited_if:stok_minimum,null',
             'lead_time' => 'nullable|integer|min:1',
+            'hari_kedaluwarsa' => 'nullable|integer|min:1',
         ];
     }
 

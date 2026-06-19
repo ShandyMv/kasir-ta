@@ -55,6 +55,7 @@ class FixMinMaxData extends Command
             $dailyRange = $p['range'];
             $frequency = $p['freq'];
             $targetStatus = $p['target'];
+            $expiry = $p['expiry'] ?? 30;
 
             $period = new \DatePeriod(
                 new \DateTime($startDate),
@@ -92,36 +93,60 @@ class FixMinMaxData extends Command
             };
             if ($finalStock < 0) $finalStock = 0;
 
-            // 4. Calculate initial stock = final stock + total consumption
-            $initQty = $finalStock + $totalConsumption;
+            $totalNeeded = $totalConsumption + $finalStock;
 
-            // 5. Create initial stok_masuk & fifo_batch
-            $firstDate = (new \DateTime($startDate))->modify('-1 day')->format('Y-m-d');
-            $initBatchKode = 'BATCH-INIT-' . strtoupper(substr(uniqid(), -5));
+            // 4. Determine batch schedule based on expiry
+            $batchDates = $p['batches'] ?? $this->getBatchDates($expiry);
 
-            $initStokMasuk = StokMasuk::create([
-                'bahan_baku_id' => $bahan->id,
-                'supplier_id' => $supplierId,
-                'jumlah' => $initQty,
-                'batch_kode' => $initBatchKode,
-                'tanggal_masuk' => $firstDate,
-                'user_id' => $this->userId,
-                'keterangan' => 'Stok awal ' . $bahan->nama_bahan,
-            ]);
+            // 5. Create batches with stock distribution
+            $totalStockNeeded = 0;
+            $createdBatches = [];
+            foreach ($batchDates as $bd) {
+                $qty = (int) round($totalNeeded * $bd['proporsi']);
+                if ($qty < 1) $qty = 1;
+                $totalStockNeeded += $qty;
+            }
 
-            $batch = FifoBatch::create([
-                'bahan_baku_id' => $bahan->id,
-                'stok_masuk_id' => $initStokMasuk->id,
-                'batch_kode' => $initBatchKode,
-                'jumlah_awal' => $initQty,
-                'sisa_stok' => $initQty,
-                'tanggal_masuk' => $firstDate,
-            ]);
+            // Adjust last batch to match totalNeeded
+            $lastIdx = count($batchDates) - 1;
+            $diff = $totalNeeded - $totalStockNeeded;
+            $batchDates[$lastIdx]['proporsi'] = ($batchDates[$lastIdx]['proporsi'] * $totalNeeded + $diff) / $totalNeeded;
 
-            // 6. Set stok_saat_ini = initQty (before any consumption)
-            BahanBaku::where('id', $bahan->id)->update(['stok_saat_ini' => $initQty]);
+            $cumStock = 0;
+            foreach ($batchDates as $i => $bd) {
+                $qty = $i === $lastIdx ? $totalNeeded - $cumStock : (int) round($totalNeeded * $bd['proporsi']);
+                if ($qty < 1) $qty = 1;
+                $cumStock += $qty;
 
-            // 7. Create stok_keluar for each day, decrementing batch & stok
+                $sumQty = $totalNeeded;
+                $batchKode = 'BATCH-' . strtoupper(substr(uniqid(), -5));
+
+                $stokMasuk = StokMasuk::create([
+                    'bahan_baku_id' => $bahan->id,
+                    'supplier_id' => $supplierId,
+                    'jumlah' => $qty,
+                    'batch_kode' => $batchKode,
+                    'tanggal_masuk' => $bd['date'],
+                    'user_id' => $this->userId,
+                    'keterangan' => 'Penerimaan ' . $bahan->nama_bahan . ' (' . $bd['date'] . ')',
+                ]);
+
+                $batch = FifoBatch::create([
+                    'bahan_baku_id' => $bahan->id,
+                    'stok_masuk_id' => $stokMasuk->id,
+                    'batch_kode' => $batchKode,
+                    'jumlah_awal' => $qty,
+                    'sisa_stok' => $qty,
+                    'tanggal_masuk' => $bd['date'],
+                ]);
+
+                $createdBatches[] = $batch;
+            }
+
+            // 6. Set stok_saat_ini = total stock
+            BahanBaku::where('id', $bahan->id)->update(['stok_saat_ini' => $totalNeeded]);
+
+            // 7. Consume stock per day using FIFO across batches
             foreach ($dailyConsumptions as $date => $qty) {
                 $stokKeluar = StokKeluar::create([
                     'bahan_baku_id' => $bahan->id,
@@ -131,29 +156,34 @@ class FixMinMaxData extends Command
                     'keterangan' => 'Produksi menu',
                 ]);
 
-                $sisa = $qty;
-                if ($sisa > $batch->sisa_stok) $sisa = $batch->sisa_stok;
+                $sisaKebutuhan = $qty;
+                foreach ($createdBatches as $cb) {
+                    if ($sisaKebutuhan <= 0) break;
+                    if ($cb->sisa_stok <= 0) continue;
 
-                StokKeluarDetail::create([
-                    'stok_keluar_id' => $stokKeluar->id,
-                    'fifo_batch_id' => $batch->id,
-                    'jumlah_ambil' => $sisa,
-                ]);
-
-                $batch->decrement('sisa_stok', $sisa);
-                BahanBaku::where('id', $bahan->id)->decrement('stok_saat_ini', $sisa);
+                    $ambil = min($cb->sisa_stok, $sisaKebutuhan);
+                    StokKeluarDetail::create([
+                        'stok_keluar_id' => $stokKeluar->id,
+                        'fifo_batch_id' => $cb->id,
+                        'jumlah_ambil' => $ambil,
+                    ]);
+                    $cb->decrement('sisa_stok', $ambil);
+                    BahanBaku::where('id', $bahan->id)->decrement('stok_saat_ini', $ambil);
+                    $sisaKebutuhan -= $ambil;
+                }
             }
 
-            // 8. Update Min-Max values in DB
+            // 8. Update Min-Max + expiry values in DB
             BahanBaku::where('id', $bahan->id)->update([
                 'safety_stock' => $ss,
                 'stok_minimum' => $min,
                 'stok_maksimum' => $max,
+                'hari_kedaluwarsa' => $expiry,
             ]);
 
             // 9. Verify final state
             $actualStock = (float) BahanBaku::where('id', $bahan->id)->value('stok_saat_ini');
-            $batchSisa = (float) FifoBatch::where('id', $batch->id)->value('sisa_stok');
+            $totalSisaBatch = (float) FifoBatch::where('bahan_baku_id', $bahan->id)->sum('sisa_stok');
 
             $statusLabel = match ($targetStatus) {
                 'KRITIS' => 'KRITIS',
@@ -162,33 +192,117 @@ class FixMinMaxData extends Command
                 'BERLEBIH' => 'BERLEBIH',
             };
 
-            $this->line("    stok={$actualStock} (target: {$finalStock}) batch_sisa={$batchSisa} ss={$ss} min={$min} max={$max} -> {$statusLabel}" . ($actualStock != $batchSisa ? ' ⚠️ MISMATCH!' : ''));
+            $mismatch = abs($actualStock - $totalSisaBatch) > 0.01;
+            $this->line("    stok={$actualStock} (target: {$finalStock}) batch_sisa={$totalSisaBatch} ss={$ss} min={$min} max={$max} -> {$statusLabel} batches=" . count($createdBatches) . ($mismatch ? ' ⚠️ MISMATCH!' : ''));
+        }
+
+        // 10. Inject extra batches for FIFO indicator variety
+        $this->injectExtraBatches();
+    }
+
+    private function injectExtraBatches(): void
+    {
+        $this->line('');
+        $this->line('>>> Menambahkan batch tambahan untuk variasi indikator FIFO...');
+
+        $extra = [
+            ['BB008', '2026-06-06', 5, 'KRITIS'],
+            ['BB004', '2026-06-10', 15, 'EXPIRED'],
+        ];
+
+        foreach ($extra as $e) {
+            $bahan = BahanBaku::where('kode_bahan', $e[0])->first();
+            if (!$bahan) continue;
+
+            $supplierId = $this->getSupplierForBahan($e[0]);
+            $qty = $e[2];
+            $tgl = $e[1];
+            $indikator = $e[3];
+
+            // Ambil qty dari batch utama (June 17) agar total stok tidak berubah
+            $mainBatch = FifoBatch::where('bahan_baku_id', $bahan->id)
+                ->where('tanggal_masuk', '2026-06-17')
+                ->first();
+
+            if (!$mainBatch || $mainBatch->sisa_stok < $qty) {
+                $sisa = $mainBatch ? $mainBatch->sisa_stok : 0;
+                $this->warn("  {$e[0]}: skip, batch utama tidak cukup stok (sisa={$sisa})");
+                continue;
+            }
+
+            // Kurangi batch utama
+            $mainBatch->decrement('sisa_stok', $qty);
+
+            // Buat batch extra
+            $batchKode = 'BATCH-' . strtoupper(substr(uniqid(), -5));
+
+            StokMasuk::create([
+                'bahan_baku_id' => $bahan->id,
+                'supplier_id' => $supplierId,
+                'jumlah' => $qty,
+                'batch_kode' => $batchKode,
+                'tanggal_masuk' => $tgl,
+                'user_id' => $this->userId,
+                'keterangan' => 'Batch tambahan ' . $bahan->nama_bahan . ' (' . $indikator . ')',
+            ]);
+
+            FifoBatch::create([
+                'bahan_baku_id' => $bahan->id,
+                'stok_masuk_id' => StokMasuk::max('id'),
+                'batch_kode' => $batchKode,
+                'jumlah_awal' => $qty,
+                'sisa_stok' => $qty,
+                'tanggal_masuk' => $tgl,
+                'keterangan' => 'Batch tambahan ' . $indikator,
+            ]);
+
+            // stok_saat_ini tidak berubah (transfer dari batch utama ke batch extra)
+            $this->line("  {$e[0]} {$bahan->nama_bahan}: ambil {$qty} dari batch 2026-06-17 -> batch {$tgl} ({$indikator})");
+        }
+    }
+
+    private function getSupplierForBahan(string $kode): int
+    {
+        $profiles = $this->getProfiles();
+        return $profiles[$kode]['supplier'] ?? 1;
+    }
+
+    private function getBatchDates(int $expiry): array
+    {
+        if ($expiry <= 3) {
+            return [
+                ['date' => '2026-06-17', 'proporsi' => 1.00],
+            ];
+        } else {
+            return [
+                ['date' => '2026-06-17', 'proporsi' => 1.00],
+            ];
         }
     }
 
     private function getProfiles(): array
     {
         return [
-            'BB001' => ['supplier' => 1,  'range' => [15, 25], 'freq' => 7, 'target' => 'AMAN'],
-            'BB002' => ['supplier' => 2,  'range' => [20, 35], 'freq' => 7, 'target' => 'AMAN'],
-            'BB003' => ['supplier' => 11, 'range' => [8, 15],  'freq' => 7, 'target' => 'AMAN'],
-            'BB004' => ['supplier' => 5,  'range' => [8, 14],  'freq' => 7, 'target' => 'AMAN'],
-            'BB005' => ['supplier' => 5,  'range' => [8, 14],  'freq' => 7, 'target' => 'AMAN'],
-            'BB006' => ['supplier' => 4,  'range' => [3, 7],   'freq' => 6, 'target' => 'AMAN'],
-            'BB007' => ['supplier' => 9,  'range' => [4, 8],   'freq' => 6, 'target' => 'AMAN'],
-            'BB008' => ['supplier' => 7,  'range' => [2, 5],   'freq' => 7, 'target' => 'AMAN'],
-            'BB009' => ['supplier' => 7,  'range' => [2, 4],   'freq' => 6, 'target' => 'KRITIS'],
-            'BB010' => ['supplier' => 8,  'range' => [3, 6],   'freq' => 5, 'target' => 'AMAN'],
-            'BB011' => ['supplier' => 4,  'range' => [2, 5],   'freq' => 5, 'target' => 'SEGERA_ROP'],
-            'BB012' => ['supplier' => 9,  'range' => [3, 6],   'freq' => 5, 'target' => 'SEGERA_ROP'],
-            'BB013' => ['supplier' => 10, 'range' => [1, 3],   'freq' => 5, 'target' => 'BERLEBIH'],
-            'BB014' => ['supplier' => 6,  'range' => [5, 10],  'freq' => 5, 'target' => 'AMAN'],
-            'BB015' => ['supplier' => 7,  'range' => [3, 6],   'freq' => 6, 'target' => 'AMAN'],
-            'BB016' => ['supplier' => 7,  'range' => [2, 5],   'freq' => 5, 'target' => 'BERLEBIH'],
-            'BB017' => ['supplier' => 7,  'range' => [3, 5],   'freq' => 5, 'target' => 'SEGERA_ROP'],
-            'BB018' => ['supplier' => 7,  'range' => [2, 4],   'freq' => 7, 'target' => 'BERLEBIH'],
-            'BB019' => ['supplier' => 7,  'range' => [2, 5],   'freq' => 5, 'target' => 'AMAN'],
-            'BB020' => ['supplier' => 7,  'range' => [1, 3],   'freq' => 6, 'target' => 'KRITIS'],
+            'BB001' => ['supplier' => 1,  'range' => [15, 25], 'freq' => 7, 'target' => 'AMAN', 'expiry' => 90],
+            'BB002' => ['supplier' => 2,  'range' => [20, 35], 'freq' => 7, 'target' => 'AMAN', 'expiry' => 21],
+            'BB003' => ['supplier' => 11, 'range' => [8, 15],  'freq' => 7, 'target' => 'AMAN', 'expiry' => 5],
+            'BB004' => ['supplier' => 5,  'range' => [8, 14],  'freq' => 7, 'target' => 'AMAN', 'expiry' => 3],
+            'BB005' => ['supplier' => 5,  'range' => [8, 14],  'freq' => 7, 'target' => 'AMAN', 'expiry' => 3],
+            'BB006' => ['supplier' => 4,  'range' => [3, 7],   'freq' => 6, 'target' => 'AMAN', 'expiry' => 5],
+            'BB007' => ['supplier' => 9,  'range' => [4, 8],   'freq' => 6, 'target' => 'AMAN', 'expiry' => 5],
+            'BB008' => ['supplier' => 7,  'range' => [2, 5],   'freq' => 7, 'target' => 'AMAN', 'expiry' => 14],
+            'BB009' => ['supplier' => 7,  'range' => [2, 4],   'freq' => 6, 'target' => 'KRITIS', 'expiry' => 14],
+            'BB010' => ['supplier' => 8,  'range' => [3, 6],   'freq' => 5, 'target' => 'AMAN', 'expiry' => 14],
+            'BB011' => ['supplier' => 4,  'range' => [2, 5],   'freq' => 5, 'target' => 'SEGERA_ROP', 'expiry' => 5],
+            'BB012' => ['supplier' => 9,  'range' => [3, 6],   'freq' => 5, 'target' => 'SEGERA_ROP', 'expiry' => 7],
+            'BB013' => ['supplier' => 10, 'range' => [1, 3],   'freq' => 5, 'target' => 'BERLEBIH', 'expiry' => 14],
+            'BB014' => ['supplier' => 6,  'range' => [5, 10],  'freq' => 5, 'target' => 'AMAN', 'expiry' => 5],
+            'BB015' => ['supplier' => 7,  'range' => [3, 6],   'freq' => 6, 'target' => 'AMAN', 'expiry' => 3],
+            'BB016' => ['supplier' => 7,  'range' => [2, 5],   'freq' => 5, 'target' => 'BERLEBIH', 'expiry' => 3],
+            'BB017' => ['supplier' => 7,  'range' => [3, 5],   'freq' => 5, 'target' => 'SEGERA_ROP', 'expiry' => 7],
+            'BB018' => ['supplier' => 7,  'range' => [2, 4],   'freq' => 7, 'target' => 'BERLEBIH', 'expiry' => 3],
+            'BB019' => ['supplier' => 7,  'range' => [2, 5],   'freq' => 5, 'target' => 'AMAN', 'expiry' => 90],
+            'BB020' => ['supplier' => 7,  'range' => [1, 3],   'freq' => 6, 'target' => 'KRITIS', 'expiry' => 7],
         ];
     }
 }

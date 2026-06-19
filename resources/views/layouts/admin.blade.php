@@ -180,6 +180,9 @@
       flex: 1;
       overflow-y: auto;
     }
+    .bg-kritis { background-color: #FD7E14 !important; }
+    .text-kritis { color: #FD7E14 !important; }
+    .badge-kritis { background-color: #FD7E14; color: #fff; padding: .35em .65em; border-radius: .375rem; }
   </style>
   @stack('styles')
 </head>
