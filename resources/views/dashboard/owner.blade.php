@@ -36,7 +36,7 @@
     <div class="card stat-card">
       <div class="card-body d-flex align-items-center">
         <div class="card-icon bg-warning bg-opacity-10 me-3" style="color:#FFAE1F;">
-          <i class="ti ti-shopping-cart-check" style="font-size:1.8rem;"></i>
+          <i class="ti ti-shopping-cart" style="font-size:1.8rem;"></i>
         </div>
         <div>
           <h3 class="mb-0 fw-bold">{{ $rekomendasiRestock }}</h3>

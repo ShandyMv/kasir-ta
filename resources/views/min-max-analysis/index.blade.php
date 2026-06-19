@@ -71,7 +71,7 @@ function getProgress($stok, $max) {
     <div class="card stat-card">
       <div class="card-body d-flex align-items-center">
         <div class="card-icon bg-dark bg-opacity-10 me-3" style="color:#6C757D;">
-          <i class="ti ti-archive-up" style="font-size:1.8rem;"></i>
+          <i class="ti ti-archive" style="font-size:1.8rem;"></i>
         </div>
         <div>
           <h3 class="mb-0 fw-bold text-dark">{{ $statBerlebih }}</h3>

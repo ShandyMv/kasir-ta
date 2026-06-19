@@ -37,7 +37,7 @@ $totalBatches = $batches->total();
   <div class="col-lg-3">
     <div class="card stat-card">
       <div class="card-body d-flex align-items-center">
-        <div class="card-icon bg-opacity-10 me-3" style="color:#FD7E14;">
+        <div class="card-icon bg-warning bg-opacity-10 me-3" style="color:#FD7E14;">
           <i class="ti ti-flame" style="font-size:1.8rem;"></i>
         </div>
         <div>

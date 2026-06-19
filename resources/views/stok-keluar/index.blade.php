@@ -13,7 +13,7 @@ $totalJumlahKeluar = $stokKeluars->sum('jumlah_keluar');
     <div class="card stat-card">
       <div class="card-body d-flex align-items-center">
         <div class="card-icon bg-warning bg-opacity-10 me-3" style="color:#FFAE1F;">
-          <i class="ti ti-archive-up" style="font-size:1.8rem;"></i>
+          <i class="ti ti-upload" style="font-size:1.8rem;"></i>
         </div>
         <div>
           <h3 class="mb-0 fw-bold">{{ number_format($totalTransaksi, 0) }}</h3>

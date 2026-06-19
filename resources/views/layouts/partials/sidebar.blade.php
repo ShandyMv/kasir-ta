@@ -25,14 +25,14 @@
 
     <li class="sidebar-item">
       <a class="sidebar-link {{ $routeStartsWith('stok-masuk') ? 'active' : '' }}" href="{{ route('stok-masuk') }}">
-        <i class="ti ti-archive-down"></i>
+        <i class="ti ti-download"></i>
         <span class="hide-menu">Stok Masuk</span>
       </a>
     </li>
 
     <li class="sidebar-item">
       <a class="sidebar-link {{ $routeStartsWith('stok-keluar') ? 'active' : '' }}" href="{{ route('stok-keluar') }}">
-        <i class="ti ti-archive-up"></i>
+        <i class="ti ti-upload"></i>
         <span class="hide-menu">Stok Keluar</span>
       </a>
     </li>

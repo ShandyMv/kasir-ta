@@ -25,6 +25,9 @@ class FixMinMaxData extends Command
         $this->info("\n=== MEMBUAT DATA REALISTIS ===\n");
         $this->generateRealisticData();
 
+        $this->info("\n>>> Menambahkan histori transaksi Maret-Mei...\n");
+        $this->generateHistoricalTransactions();
+
         $this->newLine();
         $this->info('✅ Selesai! Data konsumsi & stok sudah sinkron.');
     }
@@ -278,6 +281,49 @@ class FixMinMaxData extends Command
                 ['date' => '2026-06-17', 'proporsi' => 1.00],
             ];
         }
+    }
+
+    private function generateHistoricalTransactions(): void
+    {
+        $profiles = $this->getProfiles();
+        $months = [
+            ['year' => 2026, 'month' => 3, 'days' => 31],
+            ['year' => 2026, 'month' => 4, 'days' => 30],
+            ['year' => 2026, 'month' => 5, 'days' => 31],
+        ];
+
+        $insertCount = 0;
+
+        foreach ($months as $m) {
+            $lastDay = sprintf('%04d-%02d-%02d', $m['year'], $m['month'], $m['days']);
+
+            foreach ($profiles as $kode => $p) {
+                $bahan = BahanBaku::where('kode_bahan', $kode)->first();
+                if (!$bahan) continue;
+
+                $freqFactor = $p['freq'] / 7;
+                $consumptionDays = (int) round($m['days'] * $freqFactor);
+                $avgDaily = ($p['range'][0] + $p['range'][1]) / 2;
+                $qty = (int) round($consumptionDays * $avgDaily * (0.9 + mt_rand(0, 20) / 100));
+                if ($qty < 1) $qty = 1;
+
+                $batchKode = 'HST-' . $bahan->id . '-' . $m['month'] . '-' . substr(uniqid(), -4);
+
+                StokMasuk::create([
+                    'bahan_baku_id' => $bahan->id,
+                    'supplier_id' => $p['supplier'],
+                    'jumlah' => $qty,
+                    'batch_kode' => $batchKode,
+                    'tanggal_masuk' => $lastDay,
+                    'user_id' => $this->userId,
+                    'keterangan' => 'Histori ' . date('F', mktime(0, 0, 0, $m['month'], 1)) . ' ' . $m['year'],
+                ]);
+
+                $insertCount++;
+            }
+        }
+
+        $this->line("  {$insertCount} baris StokMasuk historis ditambahkan.");
     }
 
     private function getProfiles(): array
