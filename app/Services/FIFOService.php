@@ -12,20 +12,23 @@ class FIFOService
 {
     public function getAvailableBatches(int $bahanBakuId)
     {
-        return FifoBatch::where('bahan_baku_id', $bahanBakuId)
+        $batches = FifoBatch::with('bahanBaku')
+            ->where('bahan_baku_id', $bahanBakuId)
             ->where('sisa_stok', '>', 0)
             ->orderBy('tanggal_masuk')
             ->orderBy('id')
             ->get();
+
+        return $batches->filter(function ($fb) {
+            if (!$fb->bahanBaku->hari_kedaluwarsa) return true;
+            return !$fb->tanggal_masuk->addDays($fb->bahanBaku->hari_kedaluwarsa)->isPast();
+        })->values();
     }
 
     public function isStockSufficient(int $bahanBakuId, float $jumlah): bool
     {
-        $totalSisa = FifoBatch::where('bahan_baku_id', $bahanBakuId)
-            ->where('sisa_stok', '>', 0)
-            ->sum('sisa_stok');
-
-        return $totalSisa >= $jumlah;
+        $batches = $this->getAvailableBatches($bahanBakuId);
+        return $batches->sum('sisa_stok') >= $jumlah;
     }
 
     public function consumeStock(array $data): StokKeluar

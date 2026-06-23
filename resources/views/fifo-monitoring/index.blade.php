@@ -234,6 +234,17 @@ $totalBatches = $batches->total();
               <span>Sisa Stok: <strong>{{ number_format($gb['sisa_stok'], 0) }} {{ $group['satuan'] }}</strong></span>
               <span>Sisa Umur: <strong>{{ $gb['sisa_umur'] }}</strong></span>
             </div>
+            @if($gb['indicator'] === 'expired')
+              <div class="mt-2">
+                <form action="{{ route('fifo-monitoring.destroy', $gb['id']) }}" method="POST"
+                      onsubmit="return confirm('Yakin ingin membuang batch {{ $gb['batch_kode'] }} (sisa {{ number_format($gb['sisa_stok'], 0) }} {{ $group['satuan'] }})?')">
+                  @csrf @method('DELETE')
+                  <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                    <i class="ti ti-trash me-1"></i>Buang Batch
+                  </button>
+                </form>
+              </div>
+            @endif
           </div>
         @endforeach
       </div>

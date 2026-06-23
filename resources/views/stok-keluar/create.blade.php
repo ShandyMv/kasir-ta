@@ -35,7 +35,7 @@
           </div>
         </form>
 
-        @if($bahanBakuId && $batches->isNotEmpty())
+        @if($bahanBakuId && ($availableBatches->isNotEmpty() || $expiredBatches->isNotEmpty()))
           <form action="{{ route('stok-keluar.store') }}" method="POST">
             @csrf
             <input type="hidden" name="bahan_baku_id" value="{{ $bahanBakuId }}">
@@ -44,8 +44,15 @@
               <div class="col-md-6">
                 <label class="form-label">Jumlah Keluar</label>
                 <input type="number" step="0.01" name="jumlah_keluar" class="form-control" placeholder="0" required
-                       max="{{ $batches->sum('sisa_stok') }}">
-                <small class="text-muted">Maks: {{ number_format($batches->sum('sisa_stok'), 2) }}</small>
+                       max="{{ $availableBatches->sum('sisa_stok') }}">
+                <small class="text-muted">
+                  Stok tersedia: <strong>{{ number_format($availableBatches->sum('sisa_stok'), 2) }}</strong>
+                  @if($expiredBatches->isNotEmpty())
+                    <span class="text-danger ms-2">
+                      <i class="ti ti-alert-triangle me-1"></i>{{ number_format($expiredBatches->sum('sisa_stok'), 0) }} expired tidak terpakai
+                    </span>
+                  @endif
+                </small>
               </div>
               <div class="col-md-6">
                 <label class="form-label">Tanggal Keluar</label>
@@ -53,10 +60,14 @@
               </div>
             </div>
 
-            <div class="mb-4">
-              <label class="form-label fw-medium">Batch FIFO Tersedia</label>
+            @if($availableBatches->isNotEmpty())
+            <div class="mb-3">
+              <label class="form-label fw-medium">
+                <i class="ti ti-package me-1 text-success"></i>Batch Tersedia
+                <span class="badge bg-success ms-1">{{ $availableBatches->count() }}</span>
+              </label>
               <small class="text-muted d-block mb-2">
-                Sistem akan mengambil stok dari batch tertua secara otomatis (FIFO).
+                Sistem akan mengambil stok dari batch tertua secara otomatis (FIFO). Batch expired otomatis dilewati.
               </small>
               <div class="table-responsive">
                 <table class="table table-sm table-bordered mb-0">
@@ -65,31 +76,34 @@
                       <th>Batch</th>
                       <th>Tanggal Masuk</th>
                       <th>Sisa Stok</th>
-                      <th>Usia</th>
-                      <th>Prioritas</th>
+                      <th>Sisa Umur</th>
+                      <th>Indikator</th>
                     </tr>
                   </thead>
                   <tbody>
-                    @foreach($batches as $batch)
+                    @php $now = now(); @endphp
+                    @foreach($availableBatches as $batch)
                       @php
-                        $usia = (int) $batch->tanggal_masuk->diffInDays(now());
-                        $level = $usia > 30 ? 'danger' : ($usia > 15 ? 'warning' : 'success');
+                        $bahan = $batch->bahanBaku;
+                        $expiryDay = $bahan->hari_kedaluwarsa ?? 999;
+                        $tglKadaluwarsa = $batch->tanggal_masuk->copy()->addDays($expiryDay);
+                        $sisaHari = (int) $now->diffInDays($tglKadaluwarsa, false);
+                        $pct = $expiryDay > 0 ? (($expiryDay - max(0, $sisaHari)) / $expiryDay) * 100 : 0;
+
+                        if ($sisaHari <= 0) { $lvl = 'expired'; $label = 'Expired'; $icon = 'ti ti-alert-triangle'; $bg = 'bg-danger'; }
+                        elseif ($pct > 75) { $lvl = 'kritis'; $label = 'Kritis'; $icon = 'ti ti-flame'; $bg = 'bg-kritis'; }
+                        elseif ($pct > 50) { $lvl = 'waspada'; $label = 'Waspada'; $icon = 'ti ti-clock'; $bg = 'bg-warning text-dark'; }
+                        else { $lvl = 'aman'; $label = 'Normal'; $icon = 'ti ti-check'; $bg = 'bg-success'; }
                       @endphp
                       <tr>
                         <td><code>{{ $batch->batch_kode }}</code></td>
                         <td>{{ $batch->tanggal_masuk->format('d M Y') }}</td>
+                        <td><span class="fw-bold">{{ number_format($batch->sisa_stok, 2) }}</span></td>
+                        <td>{{ $sisaHari > 0 ? $sisaHari . ' hr' : 'Expired' }}</td>
                         <td>
-                          <span class="fw-bold">{{ number_format($batch->sisa_stok, 2) }}</span>
-                        </td>
-                        <td>{{ $usia }} hari</td>
-                        <td>
-                          @if($level === 'danger')
-                            <span class="badge bg-danger"><i class="ti ti-alert-triangle me-1"></i>Prioritas!</span>
-                          @elseif($level === 'warning')
-                            <span class="badge bg-warning text-dark"><i class="ti ti-alert-circle me-1"></i>Segera</span>
-                          @else
-                            <span class="badge bg-success"><i class="ti ti-check me-1"></i>Normal</span>
-                          @endif
+                          <span class="badge {{ $bg }}">
+                            <i class="{{ $icon }} me-1" style="font-size:.75rem;"></i>{{ $label }}
+                          </span>
                         </td>
                       </tr>
                     @endforeach
@@ -97,6 +111,57 @@
                 </table>
               </div>
             </div>
+            @endif
+
+            @if($expiredBatches->isNotEmpty())
+            <div class="mb-3">
+              <label class="form-label fw-medium">
+                <i class="ti ti-clock-off me-1 text-danger"></i>Expired (tidak dapat digunakan)
+                <span class="badge bg-danger ms-1">{{ $expiredBatches->count() }}</span>
+              </label>
+              <div class="table-responsive">
+                <table class="table table-sm table-bordered mb-0" style="opacity:0.7;">
+                  <thead class="table-danger">
+                    <tr>
+                      <th>Batch</th>
+                      <th>Tanggal Masuk</th>
+                      <th>Sisa Stok</th>
+                      <th>Kadaluarsa</th>
+                      <th>Indikator</th>
+                      <th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @foreach($expiredBatches as $batch)
+                      @php
+                        $tglExp = $batch->tanggal_masuk->addDays($batch->bahanBaku->hari_kedaluwarsa);
+                      @endphp
+                      <tr>
+                        <td><code>{{ $batch->batch_kode }}</code></td>
+                        <td>{{ $batch->tanggal_masuk->format('d M Y') }}</td>
+                        <td><span class="fw-bold">{{ number_format($batch->sisa_stok, 2) }}</span></td>
+                        <td class="text-danger">{{ $tglExp->format('d M Y') }}</td>
+                        <td>
+                          <span class="badge bg-danger">
+                            <i class="ti ti-alert-triangle me-1" style="font-size:.75rem;"></i>Expired
+                          </span>
+                        </td>
+                        <td>
+                          <form action="{{ route('fifo-monitoring.destroy', $batch->id) }}" method="POST"
+                                onsubmit="return confirm('Yakin ingin membuang batch {{ $batch->batch_kode }} ({{ number_format($batch->sisa_stok, 0) }})?')">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                              <i class="ti ti-trash me-1"></i>Buang
+                            </button>
+                          </form>
+                        </td>
+                      </tr>
+                    @endforeach
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            @endif
 
             <div class="mb-3">
               <label class="form-label">Keterangan</label>
@@ -110,7 +175,7 @@
               <a href="{{ route('stok-keluar') }}" class="btn btn-light">Batal</a>
             </div>
           </form>
-        @elseif($bahanBakuId && $batches->isEmpty())
+        @elseif($bahanBakuId && $availableBatches->isEmpty() && $expiredBatches->isEmpty())
           <div class="alert alert-info">
             <i class="ti ti-info-circle me-1"></i>Tidak ada batch dengan stok tersedia untuk bahan ini.
           </div>

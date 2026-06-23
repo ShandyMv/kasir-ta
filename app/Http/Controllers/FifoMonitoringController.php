@@ -7,6 +7,7 @@ use App\Models\BahanBaku;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\DB;
 
 class FifoMonitoringController extends Controller
 {
@@ -74,6 +75,7 @@ class FifoMonitoringController extends Controller
             }
             $batchGroups[$bid]['total_stok'] += (float) $batch->sisa_stok;
             $batchGroups[$bid]['batches'][] = [
+                'id' => $batch->id,
                 'batch_kode' => $batch->batch_kode,
                 'prioritas' => $i + 1,
                 'tgl_masuk' => $batch->tanggal_masuk->format('d M Y'),
@@ -103,5 +105,23 @@ class FifoMonitoringController extends Controller
         $batches->appends($request->query());
 
         return view('fifo-monitoring.index', compact('batches', 'search', 'filter', 'kritis', 'waspada', 'normal', 'expired', 'batchGroups'));
+    }
+
+    public function destroy(FifoBatch $fifoBatch)
+    {
+        if ($fifoBatch->sisa_stok <= 0) {
+            return back()->with('error', 'Batch sudah tidak memiliki stok.');
+        }
+
+        $sisa = $fifoBatch->sisa_stok;
+        $bahan = $fifoBatch->bahanBaku;
+
+        DB::transaction(function () use ($fifoBatch, $bahan, $sisa) {
+            $fifoBatch->update(['sisa_stok' => 0]);
+            $bahan->decrement('stok_saat_ini', $sisa);
+        });
+
+        return redirect()->route('fifo-monitoring')
+            ->with('success', "Batch {$fifoBatch->batch_kode} berhasil dibuang (" . number_format($sisa, 0) . ' stok dihapus).');
     }
 }

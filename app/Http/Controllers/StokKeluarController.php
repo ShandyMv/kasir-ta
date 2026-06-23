@@ -27,13 +27,23 @@ class StokKeluarController extends Controller
     {
         $bahanBakuId = $request->get('bahan_baku_id');
         $bahanBakus = BahanBaku::all();
-        $batches = collect();
+        $availableBatches = collect();
+        $expiredBatches = collect();
 
         if ($bahanBakuId) {
-            $batches = $fifoService->getAvailableBatches($bahanBakuId);
+            $availableBatches = $fifoService->getAvailableBatches($bahanBakuId);
+            $expiredBatches = FifoBatch::with('bahanBaku')
+                ->where('bahan_baku_id', $bahanBakuId)
+                ->where('sisa_stok', '>', 0)
+                ->whereHas('bahanBaku', fn($q) => $q->whereNotNull('hari_kedaluwarsa'))
+                ->get()
+                ->filter(fn($fb) => $fb->tanggal_masuk->addDays($fb->bahanBaku->hari_kedaluwarsa)->isPast())
+                ->values();
         }
 
-        return view('stok-keluar.create', compact('bahanBakus', 'batches', 'bahanBakuId'));
+        return view('stok-keluar.create', compact(
+            'bahanBakus', 'availableBatches', 'expiredBatches', 'bahanBakuId'
+        ));
     }
 
     public function store(StoreStokKeluarRequest $request, FIFOService $fifoService)

@@ -67,14 +67,14 @@ class DemoDataSeeder extends Seeder
             ], [
                 [20, 10], [15, 3],
             ]],
-            // 2. Telur — 3 masuk, 2 keluar
-            ['Telur', 'BB002', 'Butir', 100, 400, 2, [
+            // 2. Telur — 3 masuk, 2 keluar (hari_kedaluwarsa 14 — batch 1 & 2 expired)
+            ['Telur', 'BB002', 'Butir', 100, 400, 2, 14, [
                 [150, 50, 1], [120, 24, 1], [80, 7, 1],
             ], [
                 [40, 12], [30, 4],
             ]],
-            // 3. Ayam — 3 masuk, 2 keluar
-            ['Ayam', 'BB003', 'Ekor', 20, 80, 2, [
+            // 3. Ayam — 3 masuk, 2 keluar (hari_kedaluwarsa 10 — batch 1 & 2 expired)
+            ['Ayam', 'BB003', 'Ekor', 20, 80, 2, 10, [
                 [30, 46, 1], [20, 20, 1], [15, 4, 1],
             ], [
                 [8, 8], [5, 3],
@@ -86,8 +86,8 @@ class DemoDataSeeder extends Seeder
                 [8, 9], [5, 2],
             ]],
             // 5. Tahu — 3 masuk, 2 keluar
-            ['Tahu', 'BB005', 'Buah', 30, 100, 2, [
-                [40, 42, 4], [30, 16, 4], [20, 8, 4],
+            ['Tahu', 'BB005', 'Buah', 30, 100, 2, null, [
+                [40, 42, 1], [30, 16, 1], [20, 8, 1],
             ], [
                 [10, 7], [8, 2],
             ]],
@@ -196,7 +196,12 @@ class DemoDataSeeder extends Seeder
         $supplierArray = $suppliers->values();
 
         foreach ($bahanList as $bahanItem) {
-            [$nama, $kode, $satuanKey, $min, $max, $leadTime, $masuks, $keluars] = $bahanItem;
+            if (count($bahanItem) >= 9) {
+                [$nama, $kode, $satuanKey, $min, $max, $leadTime, $hariKedaluwarsa, $masuks, $keluars] = $bahanItem;
+            } else {
+                [$nama, $kode, $satuanKey, $min, $max, $leadTime, $masuks, $keluars] = $bahanItem;
+                $hariKedaluwarsa = null;
+            }
 
             $safetyStock = round($min * 0.2, 0);
             $bahan = BahanBaku::create([
@@ -209,6 +214,7 @@ class DemoDataSeeder extends Seeder
                 'safety_stock' => $safetyStock,
                 'reorder_point' => $min,
                 'lead_time' => $leadTime,
+                'hari_kedaluwarsa' => $hariKedaluwarsa,
             ]);
 
             // === STOK MASUK ===

@@ -61,7 +61,7 @@
 </div>
 
 <div class="row mt-3">
-  <div class="col-lg-8 d-flex align-items-stretch">
+  <div class="col-lg-8">
     <div class="card w-100">
       <div class="card-body">
         <h5 class="card-title fw-semibold mb-3">Grafik Stok Bahan Baku</h5>
@@ -73,19 +73,61 @@
       </div>
     </div>
   </div>
-  <div class="col-lg-4">
+  <div class="col-lg-4 d-flex flex-column gap-3">
+    {{-- Card Expired --}}
     <div class="card w-100">
       <div class="card-body">
-        <h5 class="card-title fw-semibold mb-3">
-          <i class="ti ti-bell-ringing text-warning me-2"></i>Notifikasi
-        </h5>
-        <div class="d-flex flex-column gap-2">
-          @foreach($notifikasi as $notif)
-            <div class="alert alert-{{ $notif['color'] }} d-flex align-items-start py-2 px-3 mb-0" role="alert" style="font-size:.85rem;">
-              <i class="{{ $notif['icon'] }} fs-5 me-2 mt-1"></i>
-              <span>{{ $notif['message'] }}</span>
+        <div class="d-flex align-items-center mb-2">
+          <i class="ti ti-clock text-danger me-2 fs-5"></i>
+          <h6 class="fw-semibold mb-0">Expired</h6>
+          @if(count($expiredNotif) > 0)
+            <span class="badge bg-danger ms-auto">{{ count($expiredNotif) }}</span>
+          @endif
+        </div>
+        <div style="max-height:200px;overflow-y:auto;">
+          @forelse($expiredNotif as $n)
+            <div class="d-flex align-items-start py-2 px-2 mb-1 rounded" style="font-size:.8rem;background:#fef2f2;border-left:3px solid #dc3545;">
+              <i class="ti ti-clock text-danger me-2 mt-1 fs-6"></i>
+              <div>
+                <span class="fw-medium">{{ $n['bahan'] }}</span><br>
+                <small class="text-muted">{{ $n['batch'] }} — expired {{ $n['expired_at'] }} (sisa {{ $n['sisa'] }} {{ $n['satuan'] }})</small>
+              </div>
             </div>
-          @endforeach
+          @empty
+            <div class="text-center text-muted py-3">
+              <i class="ti ti-check-circle fs-4 d-block mb-1"></i>
+              <small>Tidak ada expired</small>
+            </div>
+          @endforelse
+        </div>
+      </div>
+    </div>
+
+    {{-- Card Restock --}}
+    <div class="card w-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-2">
+          <i class="ti ti-alert-triangle text-warning me-2 fs-5"></i>
+          <h6 class="fw-semibold mb-0">Perlu Restock</h6>
+          @if(count($restockNotif) > 0)
+            <span class="badge bg-warning text-dark ms-auto">{{ count($restockNotif) }}</span>
+          @endif
+        </div>
+        <div style="max-height:200px;overflow-y:auto;">
+          @forelse($restockNotif as $n)
+            <div class="d-flex align-items-start py-2 px-2 mb-1 rounded" style="font-size:.8rem;background:#fffbe6;border-left:3px solid #ffc107;">
+              <i class="ti ti-alert-triangle text-warning me-2 mt-1 fs-6"></i>
+              <div>
+                <span class="fw-medium">{{ $n['bahan'] }}</span><br>
+                <small class="text-muted">stok {{ $n['stok'] }} {{ $n['satuan'] }} < {{ $n['min'] }} {{ $n['satuan'] }}</small>
+              </div>
+            </div>
+          @empty
+            <div class="text-center text-muted py-3">
+              <i class="ti ti-check-circle fs-4 d-block mb-1"></i>
+              <small>Stok semua aman</small>
+            </div>
+          @endforelse
         </div>
       </div>
     </div>

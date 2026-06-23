@@ -57,6 +57,7 @@ Route::middleware('auth')->group(function () {
     // Semua role
     Route::middleware('role:admin,karyawan,owner')->group(function () {
         Route::get('/fifo-monitoring', [FifoMonitoringController::class, 'index'])->name('fifo-monitoring');
+        Route::delete('/fifo-monitoring/{fifoBatch}', [FifoMonitoringController::class, 'destroy'])->name('fifo-monitoring.destroy');
     });
 
     // Admin + Owner
