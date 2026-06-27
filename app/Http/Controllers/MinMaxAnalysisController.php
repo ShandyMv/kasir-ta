@@ -63,6 +63,9 @@ class MinMaxAnalysisController extends Controller
 
         if ($status) {
             $processed = $processed->filter(function ($b) use ($status) {
+                if ($status === 'AMAN') {
+                    return in_array($b->status_code, ['AMAN', 'BERLEBIH']);
+                }
                 return $b->status_code === $status;
             });
         }
@@ -77,14 +80,13 @@ class MinMaxAnalysisController extends Controller
 
         $bahanBakus->appends($request->query());
 
-        $statAman = $processed->filter(fn($b) => $b->status_code === 'AMAN')->count();
+        $statAman = $processed->filter(fn($b) => in_array($b->status_code, ['AMAN', 'BERLEBIH']))->count();
         $statSegera = $processed->filter(fn($b) => $b->status_code === 'SEGERA_ROP')->count();
         $statKritis = $processed->filter(fn($b) => $b->status_code === 'KRITIS')->count();
-        $statBerlebih = $processed->filter(fn($b) => $b->status_code === 'BERLEBIH')->count();
 
         return view('min-max-analysis.index', compact(
             'bahanBakus', 'search', 'status',
-            'statAman', 'statSegera', 'statKritis', 'statBerlebih'
+            'statAman', 'statSegera', 'statKritis'
         ));
     }
 

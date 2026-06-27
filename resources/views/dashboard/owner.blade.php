@@ -158,30 +158,25 @@
           <i class="ti ti-chart-bar me-2 text-warning"></i>Ringkasan Min-Max
         </h5>
         <div class="row text-center">
-          <div class="col-3">
+          <div class="col-4">
             <div class="p-2 rounded bg-success bg-opacity-10">
               <h5 class="mb-0 text-success fw-bold">{{ $ringkasanMinMax['aman'] }}</h5>
               <small class="text-muted">Aman</small>
             </div>
           </div>
-          <div class="col-3">
+          <div class="col-4">
             <div class="p-2 rounded bg-warning bg-opacity-10">
               <h5 class="mb-0 text-warning fw-bold">{{ $ringkasanMinMax['waspada'] }}</h5>
               <small class="text-muted">Waspada</small>
             </div>
           </div>
-          <div class="col-3">
+          <div class="col-4">
             <div class="p-2 rounded bg-danger bg-opacity-10">
               <h5 class="mb-0 text-danger fw-bold">{{ $ringkasanMinMax['kritis'] }}</h5>
               <small class="text-muted">Kritis</small>
             </div>
           </div>
-          <div class="col-3">
-            <div class="p-2 rounded bg-dark bg-opacity-10">
-              <h5 class="mb-0 text-dark fw-bold">{{ $ringkasanMinMax['berlebih'] }}</h5>
-              <small class="text-muted">Berlebih</small>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>

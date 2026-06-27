@@ -94,7 +94,7 @@ class LaporanExport implements FromCollection, WithHeadings, WithMapping, WithTi
             ];
         }
 
-        $status = $row->stok_saat_ini > $row->stok_maksimum ? 'Berlebih' : ($row->stok_saat_ini < $row->stok_minimum ? 'Restock' : 'Aman');
+        $status = $row->stok_saat_ini < $row->stok_minimum ? 'Restock' : 'Aman';
         return [
             $i,
             $row->kode_bahan,

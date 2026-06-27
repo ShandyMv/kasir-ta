@@ -237,9 +237,10 @@ $totalBatches = $batches->total();
             @if($gb['indicator'] === 'expired')
               <div class="mt-2">
                 <form action="{{ route('fifo-monitoring.destroy', $gb['id']) }}" method="POST"
-                      onsubmit="return confirm('Yakin ingin membuang batch {{ $gb['batch_kode'] }} (sisa {{ number_format($gb['sisa_stok'], 0) }} {{ $group['satuan'] }})?')">
+                      id="buangForm{{ $gb['id'] }}">
                   @csrf @method('DELETE')
-                  <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                  <button type="button" class="btn btn-sm btn-outline-danger w-100"
+                          onclick="confirmBuang('{{ $gb['id'] }}', '{{ $gb['batch_kode'] }}', '{{ number_format($gb['sisa_stok'], 0) }}', '{{ $group['satuan'] }}', '{{ $group['nama'] }}')">
                     <i class="ti ti-trash me-1"></i>Buang Batch
                   </button>
                 </form>
@@ -255,5 +256,27 @@ $totalBatches = $batches->total();
   </div>
 </div>
 @endforeach
+
+@push('scripts')
+<script>
+function confirmBuang(id, batch, sisa, satuan, bahan) {
+  Swal.fire({
+    title: 'Konfirmasi',
+    html: 'Yakin ingin membuang batch <strong>' + batch + '</strong>?<br>' +
+          bahan + ' &mdash; sisa stok <strong>' + sisa + ' ' + satuan + '</strong>',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#DC3545',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: '<i class="ti ti-trash me-1"></i>Ya, Buang!',
+    cancelButtonText: 'Batal'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      document.getElementById('buangForm' + id).submit();
+    }
+  });
+}
+</script>
+@endpush
 
 @endsection

@@ -18,7 +18,7 @@ class StokMasukController extends Controller
             ->when($search, function ($q, $s) {
                 $q->whereHas('bahanBaku', fn($q) => $q->where('nama_bahan', 'like', "%{$s}%"))
                   ->orWhere('batch_kode', 'like', "%{$s}%");
-            })->latest()->paginate(10);
+            })->orderBy('tanggal_masuk', 'desc')->paginate(10);
 
         $bahanBakus = BahanBaku::all();
         $suppliers = Supplier::all();

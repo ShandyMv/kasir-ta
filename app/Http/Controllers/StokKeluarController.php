@@ -17,7 +17,7 @@ class StokKeluarController extends Controller
         $stokKeluars = StokKeluar::with(['bahanBaku', 'user', 'details.fifoBatch'])
             ->when($search, function ($q, $s) {
                 $q->whereHas('bahanBaku', fn($q) => $q->where('nama_bahan', 'like', "%{$s}%"));
-            })->latest()->paginate(10);
+            })->orderBy('tanggal_keluar', 'desc')->paginate(10);
 
         $bahanBakus = BahanBaku::all();
         return view('stok-keluar.index', compact('stokKeluars', 'bahanBakus', 'search'));

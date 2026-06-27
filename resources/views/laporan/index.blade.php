@@ -173,8 +173,8 @@
           @else
             @forelse($data as $i => $d)
               @php
-                $statusStok = $d->stok_saat_ini > $d->stok_maksimum ? 'Berlebih' : ($d->stok_saat_ini < $d->stok_minimum ? 'Restock' : 'Aman');
-                $classStok = $d->stok_saat_ini > $d->stok_maksimum ? 'dark' : ($d->stok_saat_ini < $d->stok_minimum ? 'danger' : 'success');
+                $statusStok = $d->stok_saat_ini < $d->stok_minimum ? 'Restock' : 'Aman';
+                $classStok = $d->stok_saat_ini < $d->stok_minimum ? 'danger' : 'success';
               @endphp
             <tr>
               <td>{{ $data->firstItem() + $i }}</td>

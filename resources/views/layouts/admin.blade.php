@@ -317,6 +317,7 @@
   <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
     $(document).ready(function() {
       $('.sidebartoggler').on('click', function() {

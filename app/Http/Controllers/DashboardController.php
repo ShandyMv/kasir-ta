@@ -154,9 +154,8 @@ class DashboardController extends Controller
 
     protected function owner()
     {
-        $amanCount = $this->minMax->countAman();
+        $amanCount = $this->minMax->countAman() + $this->minMax->countBerlebih();
         $restockCount = $this->minMax->countRestock();
-        $berlebihCount = $this->minMax->countBerlebih();
         $stokMenipis = $restockCount;
         $rekomendasiRestock = $restockCount;
 
@@ -197,7 +196,7 @@ class DashboardController extends Controller
             'aman' => $amanCount,
             'waspada' => $segeraCount,
             'kritis' => $kritisCount,
-            'berlebih' => $berlebihCount,
+            'berlebih' => 0,
         ];
 
         $bahanBakus = BahanBaku::with('satuan', 'fifoBatches')

@@ -33,12 +33,16 @@ class FifoMonitoringController extends Controller
         $processed = collect();
         foreach ($allBatches as $i => $batch) {
             $bahan = $batch->bahanBaku;
-            $expiry = $bahan->hari_kedaluwarsa ?? 30;
-            $tglKadaluwarsa = $batch->tanggal_masuk->copy()->addDays($expiry);
-            $sisaHari = (int) $now->diffInDays($tglKadaluwarsa, false);
-            $pct = $expiry > 0 ? (($expiry - max(0, $sisaHari)) / $expiry) * 100 : 100;
+            $tglKadaluwarsa = $bahan->hari_kedaluwarsa
+                ? $batch->tanggal_masuk->copy()->addDays($bahan->hari_kedaluwarsa)
+                : null;
+            $sisaHari = $tglKadaluwarsa ? (int) $now->diffInDays($tglKadaluwarsa, false) : 999;
+            $pct = $bahan->hari_kedaluwarsa && $bahan->hari_kedaluwarsa > 0
+                ? (($bahan->hari_kedaluwarsa - max(0, $sisaHari)) / $bahan->hari_kedaluwarsa) * 100
+                : 0;
 
-            if ($sisaHari <= 0) $indicator = 'expired';
+            if (!$tglKadaluwarsa) $indicator = 'normal';
+            elseif ($sisaHari <= 0) $indicator = 'expired';
             elseif ($pct > 75) $indicator = 'kritis';
             elseif ($pct > 50) $indicator = 'waspada';
             else $indicator = 'normal';
@@ -54,11 +58,15 @@ class FifoMonitoringController extends Controller
         // Build batch groups for detail modals
         foreach ($allBatches as $i => $batch) {
             $bahan = $batch->bahanBaku;
-            $expiry = $bahan->hari_kedaluwarsa ?? 30;
-            $tglKadaluwarsa = $batch->tanggal_masuk->copy()->addDays($expiry);
-            $sisaHari = (int) $now->diffInDays($tglKadaluwarsa, false);
-            $pct = $expiry > 0 ? (($expiry - max(0, $sisaHari)) / $expiry) * 100 : 100;
-            if ($sisaHari <= 0) $ind = 'expired';
+            $tglKadaluwarsa = $bahan->hari_kedaluwarsa
+                ? $batch->tanggal_masuk->copy()->addDays($bahan->hari_kedaluwarsa)
+                : null;
+            $sisaHari = $tglKadaluwarsa ? (int) $now->diffInDays($tglKadaluwarsa, false) : 999;
+            $pct = $bahan->hari_kedaluwarsa && $bahan->hari_kedaluwarsa > 0
+                ? (($bahan->hari_kedaluwarsa - max(0, $sisaHari)) / $bahan->hari_kedaluwarsa) * 100
+                : 0;
+            if (!$tglKadaluwarsa) $ind = 'normal';
+            elseif ($sisaHari <= 0) $ind = 'expired';
             elseif ($pct > 75) $ind = 'kritis';
             elseif ($pct > 50) $ind = 'waspada';
             else $ind = 'normal';
@@ -67,7 +75,7 @@ class FifoMonitoringController extends Controller
             if (!isset($batchGroups[$bid])) {
                 $batchGroups[$bid] = [
                     'nama' => $bahan->nama_bahan,
-                    'expiry' => $expiry,
+                    'expiry' => $bahan->hari_kedaluwarsa,
                     'total_stok' => 0,
                     'satuan' => $bahan->satuan->nama_satuan,
                     'batches' => [],

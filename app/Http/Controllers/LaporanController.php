@@ -148,8 +148,8 @@ class LaporanController extends Controller
             $items = $query->get();
 
             foreach ($items as $i => $d) {
-                $status = $d->stok_saat_ini > $d->stok_maksimum ? 'Berlebih' : ($d->stok_saat_ini < $d->stok_minimum ? 'Restock' : 'Aman');
-                $class = $d->stok_saat_ini > $d->stok_maksimum ? 'dark' : ($d->stok_saat_ini < $d->stok_minimum ? 'danger' : 'success');
+                $status = $d->stok_saat_ini < $d->stok_minimum ? 'Restock' : 'Aman';
+                $class = $d->stok_saat_ini < $d->stok_minimum ? 'danger' : 'success';
                 $rows[] = [
                     $i + 1,
                     e($d->kode_bahan),

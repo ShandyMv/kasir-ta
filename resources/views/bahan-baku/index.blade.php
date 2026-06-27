@@ -1,13 +1,12 @@
 @php
-$totalBahan = $bahanBakus->total();
-$stokAman = $bahanBakus->filter(fn($b) => $b->stok_saat_ini >= $b->stok_minimum && $b->stok_saat_ini <= $b->stok_maksimum)->count();
-$stokRestock = $bahanBakus->filter(fn($b) => $b->stok_saat_ini < $b->stok_minimum)->count();
-$stokBerlebih = $bahanBakus->filter(fn($b) => $b->stok_saat_ini > $b->stok_maksimum)->count();
-
-function getStatusBahan($stok, $min, $max) {
-    if ($stok > $max) return ['label' => 'Berlebih', 'class' => 'dark'];
-    if ($stok < $min) return ['label' => 'Restock', 'class' => 'danger'];
-    return ['label' => 'Aman', 'class' => 'success'];
+function getStatusBahan($code) {
+    $map = [
+        'BERLEBIH' => ['label' => 'Aman', 'class' => 'success'],
+        'AMAN' => ['label' => 'Aman', 'class' => 'success'],
+        'SEGERA_ROP' => ['label' => 'Segera Restock', 'class' => 'warning'],
+        'KRITIS' => ['label' => 'Kritis', 'class' => 'danger'],
+    ];
+    return $map[$code] ?? ['label' => '-', 'class' => 'secondary'];
 }
 @endphp
 
@@ -20,12 +19,12 @@ function getStatusBahan($stok, $min, $max) {
   <div class="col-lg-4">
     <div class="card stat-card">
       <div class="card-body d-flex align-items-center">
-        <div class="card-icon bg-primary bg-opacity-10 me-3" style="color:#5D87FF;">
-          <i class="ti ti-box"></i>
+        <div class="card-icon bg-success bg-opacity-10 me-3" style="color:#39B69A;">
+          <i class="ti ti-shield-check" style="font-size:1.8rem;"></i>
         </div>
         <div>
-          <h3 class="mb-0 fw-bold">{{ $totalBahan }}</h3>
-          <small class="text-muted">Total Bahan Baku</small>
+          <h3 class="mb-0 fw-bold text-success">{{ $statAman }}</h3>
+          <small class="text-muted">Bahan Aman</small>
         </div>
       </div>
     </div>
@@ -33,12 +32,12 @@ function getStatusBahan($stok, $min, $max) {
   <div class="col-lg-4">
     <div class="card stat-card">
       <div class="card-body d-flex align-items-center">
-        <div class="card-icon bg-success bg-opacity-10 me-3" style="color:#39B69A;">
-          <i class="ti ti-shield-check"></i>
+        <div class="card-icon bg-warning bg-opacity-10 me-3" style="color:#FFAE1F;">
+          <i class="ti ti-alert-circle" style="font-size:1.8rem;"></i>
         </div>
         <div>
-          <h3 class="mb-0 fw-bold">{{ $stokAman }}</h3>
-          <small class="text-muted">Stok Aman</small>
+          <h3 class="mb-0 fw-bold text-warning">{{ $statSegera }}</h3>
+          <small class="text-muted">Segera Restock</small>
         </div>
       </div>
     </div>
@@ -47,15 +46,16 @@ function getStatusBahan($stok, $min, $max) {
     <div class="card stat-card">
       <div class="card-body d-flex align-items-center">
         <div class="card-icon bg-danger bg-opacity-10 me-3" style="color:#DC3545;">
-          <i class="ti ti-alert-triangle"></i>
+          <i class="ti ti-alert-triangle" style="font-size:1.8rem;"></i>
         </div>
         <div>
-          <h3 class="mb-0 fw-bold">{{ $stokRestock + $stokBerlebih }}</h3>
-          <small class="text-muted">Perlu Perhatian</small>
+          <h3 class="mb-0 fw-bold text-danger">{{ $statKritis }}</h3>
+          <small class="text-muted">Kritis</small>
         </div>
       </div>
     </div>
   </div>
+
 </div>
 
 <div class="card">
@@ -89,15 +89,17 @@ function getStatusBahan($stok, $min, $max) {
             <th>Nama Bahan</th>
             <th>Satuan</th>
             <th>Stok</th>
+            <th>Safety</th>
             <th>Min</th>
             <th>Max</th>
+            <th>Progress</th>
             <th>Status</th>
             <th>Aksi</th>
           </tr>
         </thead>
         <tbody>
           @forelse($bahanBakus as $i => $b)
-            @php $status = getStatusBahan($b->stok_saat_ini, $b->stok_minimum, $b->stok_maksimum); @endphp
+            @php $status = getStatusBahan($b->status_code); @endphp
           <tr>
             <td>{{ $bahanBakus->firstItem() + $i }}</td>
             <td><code>{{ $b->kode_bahan }}</code></td>
@@ -107,8 +109,17 @@ function getStatusBahan($stok, $min, $max) {
               <span class="fw-bold">{{ number_format($b->stok_saat_ini, 0) }}</span>
               <small class="text-muted">{{ $b->satuan->nama_satuan }}</small>
             </td>
-            <td>{{ number_format($b->stok_minimum, 0) }}</td>
-            <td>{{ number_format($b->stok_maksimum, 0) }}</td>
+            <td>{{ number_format($b->safety_stock_calc, 0) }}</td>
+            <td>{{ number_format($b->min_stock_calc, 0) }}</td>
+            <td>{{ number_format($b->max_stock_calc, 0) }}</td>
+            <td style="min-width:110px;">
+              <div class="d-flex align-items-center gap-2">
+                <div class="progress" style="width:70px;height:8px;">
+                  <div class="progress-bar bg-{{ $status['class'] }}" style="width:{{ min(100, $b->max_stock_calc > 0 ? ($b->stok_saat_ini / $b->max_stock_calc) * 100 : 0) }}%;" role="progressbar"></div>
+                </div>
+                <small class="text-muted">{{ number_format(min(100, $b->max_stock_calc > 0 ? ($b->stok_saat_ini / $b->max_stock_calc) * 100 : 0), 0) }}%</small>
+              </div>
+            </td>
             <td>
               <span class="badge bg-{{ $status['class'] }} bg-opacity-10 text-{{ $status['class'] }} px-3 py-1">
                 {{ $status['label'] }}
@@ -129,7 +140,7 @@ function getStatusBahan($stok, $min, $max) {
           </tr>
           @empty
           <tr>
-            <td colspan="9" class="text-center text-muted py-4">Belum ada data bahan baku.</td>
+            <td colspan="11" class="text-center text-muted py-4">Belum ada data bahan baku.</td>
           </tr>
           @endforelse
         </tbody>
